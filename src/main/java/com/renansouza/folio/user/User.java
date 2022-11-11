@@ -1,15 +1,11 @@
 package com.renansouza.folio.user;
 
-import com.renansouza.folio.utils.WordUtils;
+import com.renansouza.folio.shared.Auditable;
+import lombok.*;
+import org.hibernate.Hibernate;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
+import javax.persistence.*;
+import java.io.Serializable;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -18,10 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-public class User implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = -1362258531757232654L;
+public class User extends Auditable<String> implements Serializable {
 
     @Id
     @Getter
@@ -36,10 +29,6 @@ public class User implements Serializable {
     @Setter
     @Column
     private String avatar;
-    @LastModifiedDate
-    private LocalDateTime registration;
-    @CreatedDate
-    private LocalDateTime modification;
 
     public User(UserForm userForm) {
         var now = LocalDateTime.now();
