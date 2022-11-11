@@ -1,11 +1,11 @@
 package com.renansouza.folio.user;
 
+import com.renansouza.folio.shared.Auditable;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -14,7 +14,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-public class User {
+public class User extends Auditable<String> implements Serializable {
 
     @Id
     @Getter
@@ -24,17 +24,11 @@ public class User {
     @Setter
     @Column(nullable = false)
     private String name;
-    @LastModifiedDate
-    private LocalDateTime registration;
-    @CreatedDate
-    private LocalDateTime modification;
 
     public User(String name) {
         var now = LocalDateTime.now();
 
         this.name = name;
-        this.registration = now;
-        this.modification = now;
     }
 
     @Override
