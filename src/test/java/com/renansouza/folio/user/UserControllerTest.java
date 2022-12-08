@@ -15,14 +15,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -44,8 +43,6 @@ class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    private User user;
 
     @BeforeEach
     public void setup() {
@@ -83,7 +80,8 @@ class UserControllerTest {
     @Test
     @DisplayName("should find an user")
     void findById() throws Exception {
-        var user = new User("User");
+        LocalDateTime now = LocalDateTime.now();
+        var user = new User(1, "User", null, now, now);
 
         when(service.findById(anyLong())).thenReturn(user);
 
@@ -96,9 +94,10 @@ class UserControllerTest {
     @Test
     @DisplayName("should add a new user")
     void add() throws Exception {
-        when(service.add(anyString())).thenReturn(null);
+        when(service.add(any(UserForm.class))).thenReturn(null);
+        var form = new UserForm("User", null);
 
-        mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString("User")))
+        mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(form)))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -106,12 +105,12 @@ class UserControllerTest {
     @Test
     @DisplayName("should not add a new user")
     void failToAdd() throws Exception {
-        var user = new User("User");
-        var message = "An user with the name " + user.getName() + " already exists";
+        var form = new UserForm("User", null);
+        var message = "An user with the name " + form.getName() + " already exists";
 
-        when(service.add(anyString())).thenThrow(new UserAlreadyExistsException(user.getName()));
+        when(service.add(any(UserForm.class))).thenThrow(new UserAlreadyExistsException(form.getName()));
 
-        mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString("User")))
+        mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(form)))
                 .andDo(print())
                 .andExpect(status().isConflict())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserAlreadyExistsException))

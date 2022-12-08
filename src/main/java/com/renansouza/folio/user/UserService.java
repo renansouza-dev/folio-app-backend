@@ -21,11 +21,11 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public User add(String name) throws UserAlreadyExistsException {
-        if (repository.findByNameIgnoreCase(name).isPresent()) {
-            throw new UserAlreadyExistsException(name);
+    public User add(UserForm userForm) throws UserAlreadyExistsException {
+        if (repository.findByNameIgnoreCase(userForm.getName()).isPresent()) {
+            throw new UserAlreadyExistsException(userForm.getName());
         }
 
-        return repository.save(new User(name));
+        return repository.save(new User(userForm));
     }
 }
