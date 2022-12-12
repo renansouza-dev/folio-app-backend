@@ -23,4 +23,5 @@ public class UserAdvice {
     String userAlreadyExists(UserAlreadyExistsException ex) {
         return ex.getMessage();
     }
+
 }
