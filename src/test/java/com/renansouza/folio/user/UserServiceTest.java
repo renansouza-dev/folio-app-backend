@@ -30,14 +30,14 @@ class UserServiceTest {
     @Test
     @DisplayName("should find all users")
     void findAll() {
-        var user = new User("User");
-        List<User> users = Collections.singletonList(user);
+        var form = new UserForm("User", null);
+        List<User> users = Collections.singletonList(new User(form));
 
         when(repository.findAll()).thenReturn(users);
         var expected = service.findAll();
 
         assertTrue(expected.iterator().hasNext());
-        assertEquals(expected.iterator().next().getName(), user.getName());
+        assertEquals(expected.iterator().next().getName(), form.getName());
     }
 
     @Test
@@ -53,12 +53,12 @@ class UserServiceTest {
     @Test
     @DisplayName("should find an user by id")
     void findById() {
-        var user = new User("User");
+        var form = new UserForm("User", null);
 
-        when(repository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(repository.findById(anyLong())).thenReturn(Optional.of(new User(form)));
         var expected = service.findById(1L);
 
-        assertEquals(expected.getName(), user.getName());
+        assertEquals(expected.getName(), form.getName());
     }
 
     @Test
@@ -74,25 +74,25 @@ class UserServiceTest {
     @Test
     @DisplayName("should add an users")
     void add() {
-        String name = "User";
-        var user = new User(name);
+        var name = "User";
+        var form = new UserForm(name, null);
 
         when(repository.findByNameIgnoreCase(anyString())).thenReturn(Optional.empty());
-        when(repository.save(any(User.class))).thenReturn(user);
+        when(repository.save(any(User.class))).thenReturn(new User(form));
 
-        var expected = service.add(name);
-        assertEquals(expected.getName(), user.getName());
+        var expected = service.add(form);
+        assertEquals(expected.getName(), form.getName());
     }
 
     @Test
     @DisplayName("should not add an users")
     void notAdd() {
-        String name = "User";
-        var user = new User(name);
+        var name = "User";
+        var form = new UserForm(name, null);
 
-        when(repository.findByNameIgnoreCase(anyString())).thenReturn(Optional.of(user));
+        when(repository.findByNameIgnoreCase(anyString())).thenReturn(Optional.of(new User(form)));
 
-        UserAlreadyExistsException thrown = Assertions.assertThrows(UserAlreadyExistsException.class, () -> service.add(name));
+        var thrown = Assertions.assertThrows(UserAlreadyExistsException.class, () -> service.add(form));
         Assertions.assertEquals("An user with the name " + name + " already exists", thrown.getMessage());
     }
 }

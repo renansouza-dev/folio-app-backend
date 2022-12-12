@@ -54,8 +54,8 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "409", description = "User already saved")
     })
-    ResponseEntity<User> add(@RequestBody() String name) throws UserAlreadyExistsException {
-        return ResponseEntity.ok().body(service.add(name));
+    ResponseEntity<User> add(@RequestBody UserForm userForm) throws UserAlreadyExistsException {
+        return ResponseEntity.ok().body(service.add(userForm));
     }
 
 }
