@@ -81,7 +81,7 @@ class UserControllerTest {
     @DisplayName("should find an user")
     void findById() throws Exception {
         LocalDateTime now = LocalDateTime.now();
-        var user = new User(1, "User", null, now, now);
+        var user = new User(1, "User", "avatar", now, now);
 
         when(service.findById(anyLong())).thenReturn(user);
 
@@ -95,7 +95,7 @@ class UserControllerTest {
     @DisplayName("should add a new user")
     void add() throws Exception {
         when(service.add(any(UserForm.class))).thenReturn(null);
-        var form = new UserForm("User", null);
+        var form = new UserForm("User", "avatar");
 
         mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(form)))
                 .andDo(print())
@@ -105,7 +105,7 @@ class UserControllerTest {
     @Test
     @DisplayName("should not add a new user")
     void failToAdd() throws Exception {
-        var form = new UserForm("User", null);
+        var form = new UserForm("User", "avatar");
         var message = "An user with the name " + form.getName() + " already exists";
 
         when(service.add(any(UserForm.class))).thenThrow(new UserAlreadyExistsException(form.getName()));
