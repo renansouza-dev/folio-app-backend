@@ -12,10 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@ApiResponses
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/user")
-@ApiResponses
 public class UserController {
 
     private final UserService service;

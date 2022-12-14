@@ -95,4 +95,5 @@ class UserServiceTest {
         var thrown = Assertions.assertThrows(UserAlreadyExistsException.class, () -> service.add(form));
         Assertions.assertEquals("An user with the name " + name + " already exists", thrown.getMessage());
     }
+
 }
