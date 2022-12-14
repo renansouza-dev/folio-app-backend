@@ -1,7 +1,5 @@
 package com.renansouza.folio.utils;
 
-import lombok.NoArgsConstructor;
-
 import java.util.Objects;
 
 public class WordUtils {
