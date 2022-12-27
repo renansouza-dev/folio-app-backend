@@ -1,12 +1,14 @@
 package com.renansouza.folio.user;
 
 import com.renansouza.folio.shared.Auditable;
-import lombok.*;
-import org.hibernate.Hibernate;
+import com.renansouza.folio.shared.EntityAuditorAware;
+import com.renansouza.folio.utils.WordUtils;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -32,8 +34,13 @@ public class User extends Auditable<String> implements Serializable {
 
     public User(UserForm userForm) {
         var now = LocalDateTime.now();
-        this.registration = now;
-        this.modification = now;
+        this.setLastModifiedDate(now);
+        this.setCreatedDate(now);
+
+        var auditor = new EntityAuditorAware().getCurrentAuditor();
+        this.setLastModifiedBy(String.valueOf(auditor));
+        this.setCreatedBy(String.valueOf(auditor));
+
 
         this.avatar = userForm.getAvatar();
         this.name = WordUtils.capitalizeFully(userForm.getName());

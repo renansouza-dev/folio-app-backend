@@ -21,7 +21,8 @@ import java.util.Collections;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -81,7 +82,9 @@ class UserControllerTest {
     @DisplayName("should find an user")
     void findById() throws Exception {
         LocalDateTime now = LocalDateTime.now();
-        var user = new User(1, "User", "avatar", now, now);
+        var user = new User(1, "User", "avatar");
+        user.setLastModifiedDate(now);
+        user.setCreatedDate(now);
 
         when(service.findById(anyLong())).thenReturn(user);
 

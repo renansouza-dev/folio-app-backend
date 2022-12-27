@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,13 +50,13 @@ public class UserController {
     @Operation(summary = "Add a new user.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200", description = "Successful operation",
+                    responseCode = "201", description = "User created",
                     content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class))}),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "409", description = "User already saved")
     })
     ResponseEntity<User> add(@RequestBody UserForm userForm) throws UserAlreadyExistsException {
-        return ResponseEntity.ok().body(service.add(userForm));
+        return new ResponseEntity<>(service.add(userForm), HttpStatus.CREATED);
     }
 
 }
