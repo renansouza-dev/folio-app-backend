@@ -20,6 +20,7 @@
         <liquibase.version>4.18.0</liquibase.version>
 		<springdoc-openapi.version>2.0.2</springdoc-openapi.version>
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
+		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
 	</properties>
 
 	<dependencies>
@@ -52,6 +53,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate-validator.version}</version>
 		</dependency>
 
 		<!-- Tests -->

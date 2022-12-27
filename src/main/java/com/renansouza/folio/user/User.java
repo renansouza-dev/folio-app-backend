@@ -18,10 +18,6 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 public class User extends Auditable<String> implements Serializable {
 
-    @Id
-    @Getter
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
     @Getter
     @Setter
     @Column(nullable = false)

@@ -1,9 +1,6 @@
 package com.renansouza.folio.shared;
 
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -19,6 +16,11 @@ import java.time.LocalDateTime;
 @MappedSuperclass // => a superclass and is not a JPA entity
 @EntityListeners(AuditingEntityListener.class)
 public abstract class Auditable<T> {
+
+    @Id
+    @Getter
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
     @CreatedBy
     public T createdBy;

@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.is;
@@ -26,7 +25,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -59,7 +57,6 @@ class UserControllerTest {
         when(service.findAll()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/user").contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk());
     }
 
@@ -72,7 +69,6 @@ class UserControllerTest {
         var message = "Could not found an user with id " + id;
 
         mockMvc.perform(get("/user/" + id).contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserNotFoundException))
                 .andExpect(result -> assertEquals(message, result.getResolvedException().getMessage()));
@@ -81,15 +77,11 @@ class UserControllerTest {
     @Test
     @DisplayName("should find an user")
     void findById() throws Exception {
-        LocalDateTime now = LocalDateTime.now();
-        var user = new User(1, "User", "avatar");
-        user.setLastModifiedDate(now);
-        user.setCreatedDate(now);
+        var user = new User("User", "avatar");
 
         when(service.findById(anyLong())).thenReturn(user);
 
         mockMvc.perform(get("/user/" + user.getId()).contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is(user.getName())));
     }
@@ -101,7 +93,6 @@ class UserControllerTest {
         var form = new UserForm("User", "avatar");
 
         mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(form)))
-                .andDo(print())
                 .andExpect(status().isCreated());
     }
 
@@ -114,7 +105,6 @@ class UserControllerTest {
         when(service.add(any(UserForm.class))).thenThrow(new UserAlreadyExistsException(form.getName()));
 
         mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(form)))
-                .andDo(print())
                 .andExpect(status().isConflict())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserAlreadyExistsException))
                 .andExpect(result -> assertEquals(message, result.getResolvedException().getMessage()));
