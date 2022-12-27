@@ -102,7 +102,7 @@ class UserControllerTest {
 
         mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(form)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
