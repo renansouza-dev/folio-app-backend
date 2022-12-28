@@ -3,6 +3,9 @@ package com.renansouza.folio.utils;
 import java.util.Objects;
 
 public class WordUtils {
+    private WordUtils() {
+    }
+
     public static String capitalizeFully(String word) {
         if (Objects.isNull(word) || word.length() == 0) {
             return word;

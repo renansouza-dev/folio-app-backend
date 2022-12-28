@@ -1,8 +1,9 @@
 package com.renansouza.folio.shared;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -11,15 +12,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@Getter
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
 @MappedSuperclass // => a superclass and is not a JPA entity
+@NoArgsConstructor // JPA uses the default constructor to create a class using the reflection API
 @EntityListeners(AuditingEntityListener.class)
 public abstract class Auditable<T> {
 
     @Id
+    @Getter
     @Setter
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -28,9 +27,7 @@ public abstract class Auditable<T> {
     @CreatedBy
     public T createdBy;
 
-    @Setter
     @CreatedDate
-    @Builder.Default
     @Temporal(TemporalType.TIMESTAMP)
     public LocalDateTime createdDate = LocalDateTime.now();
 
@@ -39,8 +36,9 @@ public abstract class Auditable<T> {
     public T lastModifiedBy;
 
     @Setter
-    @Builder.Default
+    @Getter
     @LastModifiedDate
     @Temporal(TemporalType.TIMESTAMP)
     public LocalDateTime lastModifiedDate = LocalDateTime.now();
+
 }

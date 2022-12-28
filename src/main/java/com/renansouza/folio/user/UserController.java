@@ -46,6 +46,18 @@ public class UserController {
         return ResponseEntity.ok().body(service.findById(id));
     }
 
+    @PutMapping()
+    @Operation(summary = "Update a user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Successful operation"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    ResponseEntity<Void> update(@RequestBody User user) throws UserNotFoundException {
+        service.update(user);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add a new user.")
     @ApiResponses(value = {
@@ -55,8 +67,8 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "409", description = "User already saved")
     })
-    ResponseEntity<User> add(@RequestBody UserForm userForm) throws UserAlreadyExistsException {
-        return new ResponseEntity<>(service.add(userForm), HttpStatus.CREATED);
+    ResponseEntity<User> add(@RequestBody User user) throws UserAlreadyExistsException {
+        return new ResponseEntity<>(service.add(user), HttpStatus.CREATED);
     }
 
 }
