@@ -8,12 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "transactions")
@@ -37,7 +39,7 @@ public class Transaction extends Auditable<String> implements Serializable {
     @Getter
     @Setter
     @Column(nullable = false)
-    private float quantity;
+    private double quantity;
 
     @Getter
     @Setter

@@ -2,6 +2,7 @@ package com.renansouza.folio.user;
 
 import com.renansouza.folio.user.exception.UserAlreadyExistsException;
 import com.renansouza.folio.user.exception.UserNotFoundException;
+import com.renansouza.folio.utils.WordUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ class UserServiceTest {
     @DisplayName("should find all users")
     void findAll() {
         var form = new UserForm("User", null);
-        List<User> users = Collections.singletonList(new User(form));
+        List<User> users = Collections.singletonList(getUser());
 
         when(repository.findAll()).thenReturn(users);
         var expected = service.findAll();
@@ -55,7 +56,7 @@ class UserServiceTest {
     void findById() {
         var form = new UserForm("User", null);
 
-        when(repository.findById(anyLong())).thenReturn(Optional.of(new User(form)));
+        when(repository.findById(anyLong())).thenReturn(Optional.of(getUser()));
         var expected = service.findById(1L);
 
         assertEquals(expected.getName(), form.getName());
@@ -78,7 +79,7 @@ class UserServiceTest {
         var form = new UserForm(name, null);
 
         when(repository.findByNameIgnoreCase(anyString())).thenReturn(Optional.empty());
-        when(repository.save(any(User.class))).thenReturn(new User(form));
+        when(repository.save(any(User.class))).thenReturn(getUser());
 
         var expected = service.add(form);
         assertEquals(expected.getName(), form.getName());
@@ -90,10 +91,19 @@ class UserServiceTest {
         var name = "User";
         var form = new UserForm(name, null);
 
-        when(repository.findByNameIgnoreCase(anyString())).thenReturn(Optional.of(new User(form)));
+        when(repository.findByNameIgnoreCase(anyString())).thenReturn(Optional.of(getUser()));
 
         var thrown = Assertions.assertThrows(UserAlreadyExistsException.class, () -> service.add(form));
         Assertions.assertEquals("An user with the name " + name + " already exists", thrown.getMessage());
+    }
+
+    private User getUser() {
+        return User.builder()
+                .name(WordUtils.capitalizeFully("User"))
+                .avatar("avatar")
+                .createdBy("auditor")
+                .lastModifiedBy("auditor")
+                .build();
     }
 
 }

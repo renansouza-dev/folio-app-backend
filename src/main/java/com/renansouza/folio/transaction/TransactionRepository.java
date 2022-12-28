@@ -16,6 +16,6 @@ public interface TransactionRepository extends PagingAndSortingRepository<Transa
 
     Optional<Transaction> findById(long id);
 
-    Optional<User> findByClassificationIgnoreCase(String classification);
+    Optional<List<Transaction>> findByClassificationIgnoreCase(String classification);
 
 }
