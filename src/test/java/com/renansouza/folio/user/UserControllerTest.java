@@ -130,8 +130,6 @@ class UserControllerTest {
         var message = "Could not found an user with id " + user.getId();
         Mockito.doThrow(new UserNotFoundException(user.getId())).when(service).update(any(User.class));
 
-//        when(service.update(any(User.class))).thenThrow(new UserNotFoundException(user.getId()));
-
         mockMvc.perform(put("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user)))
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserNotFoundException))
