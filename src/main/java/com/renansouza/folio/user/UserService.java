@@ -1,7 +1,9 @@
 package com.renansouza.folio.user;
 
+import com.renansouza.folio.shared.EntityAuditorAware;
 import com.renansouza.folio.user.exception.UserAlreadyExistsException;
 import com.renansouza.folio.user.exception.UserNotFoundException;
+import com.renansouza.folio.utils.WordUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,14 @@ public class UserService {
             throw new UserAlreadyExistsException(userForm.getName());
         }
 
-        return repository.save(new User(userForm));
+        var auditor = new EntityAuditorAware().getCurrentAuditor();
+        var user = User.builder()
+                .name(WordUtils.capitalizeFully(userForm.getName()))
+                .avatar(userForm.getAvatar())
+                .createdBy(String.valueOf(auditor))
+                .lastModifiedBy(String.valueOf(auditor))
+                .build();
+
+        return repository.save(user);
     }
 }

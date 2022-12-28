@@ -1,18 +1,19 @@
 package com.renansouza.folio.user;
 
 import com.renansouza.folio.shared.Auditable;
-import com.renansouza.folio.shared.EntityAuditorAware;
-import com.renansouza.folio.utils.WordUtils;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Entity
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
@@ -28,17 +29,4 @@ public class User extends Auditable<String> implements Serializable {
     @Column
     private String avatar;
 
-    public User(UserForm userForm) {
-        var now = LocalDateTime.now();
-        this.setLastModifiedDate(now);
-        this.setCreatedDate(now);
-
-        var auditor = new EntityAuditorAware().getCurrentAuditor();
-        this.setLastModifiedBy(String.valueOf(auditor));
-        this.setCreatedBy(String.valueOf(auditor));
-
-
-        this.avatar = userForm.getAvatar();
-        this.name = WordUtils.capitalizeFully(userForm.getName());
-    }
 }
