@@ -23,13 +23,11 @@ class UserTest {
 
     @Test
     public void nameIsNull() {
-        var expected = "não deve estar em branco";
         var user = new User(null, null);
 
         Set<ConstraintViolation<User>> constraintViolations = validator.validate(user);
 
         Assertions.assertEquals(1, constraintViolations.size());
-        Assertions.assertEquals(expected, constraintViolations.iterator().next().getMessage());
     }
 
     @Test
@@ -42,13 +40,11 @@ class UserTest {
 
     @Test
     public void nameIsShort() {
-        var expected = "tamanho deve ser entre 5 e 255";
         var user = new User("abc", null);
 
         Set<ConstraintViolation<User>> constraintViolations = validator.validate(user);
 
         Assertions.assertEquals(1, constraintViolations.size());
-        Assertions.assertEquals(expected, constraintViolations.iterator().next().getMessage());
     }
 
     @Test
@@ -72,12 +68,10 @@ class UserTest {
 
     @Test
     public void avatarIsInvalid() {
-        var expected = "deve ser uma URL válida";
         var user = new User("username", "http://www.example.com");
 
         Set<ConstraintViolation<User>> constraintViolations = validator.validate(user);
 
         Assertions.assertEquals(1, constraintViolations.size());
-        Assertions.assertEquals(expected, constraintViolations.iterator().next().getMessage());
     }
 }
