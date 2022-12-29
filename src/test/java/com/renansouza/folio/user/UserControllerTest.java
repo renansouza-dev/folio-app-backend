@@ -1,6 +1,7 @@
 package com.renansouza.folio.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.renansouza.folio.user.exception.UserAlreadyExistsException;
 import com.renansouza.folio.user.exception.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,23 +10,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,7 +58,6 @@ class UserControllerTest {
         when(service.findAll()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/user").contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk());
     }
 
@@ -71,7 +70,6 @@ class UserControllerTest {
         var message = "Could not found an user with id " + id;
 
         mockMvc.perform(get("/user/" + id).contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserNotFoundException))
                 .andExpect(result -> assertEquals(message, result.getResolvedException().getMessage()));
@@ -80,13 +78,11 @@ class UserControllerTest {
     @Test
     @DisplayName("should find an user")
     void findById() throws Exception {
-        LocalDateTime now = LocalDateTime.now();
-        var user = new User(1, "User", "avatar", now, now);
+        var user = new User("User", "avatar");
 
         when(service.findById(anyLong())).thenReturn(user);
 
         mockMvc.perform(get("/user/" + user.getId()).contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is(user.getName())));
     }
@@ -94,32 +90,58 @@ class UserControllerTest {
     @Test
     @DisplayName("should add a new user")
     void add() throws Exception {
-        when(service.add(any(UserForm.class))).thenReturn(null);
-        var form = new UserForm("User", "avatar");
+        when(service.add(any(User.class))).thenReturn(null);
+        var user = new User("Username", null);
 
-        mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(form)))
-                .andDo(print())
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user)))
+                .andExpect(status().isCreated());
     }
 
     @Test
     @DisplayName("should not add a new user")
     void failToAdd() throws Exception {
-        var form = new UserForm("User", "avatar");
-        var message = "An user with the name " + form.getName() + " already exists";
+        var user = new User("Username", "avatar");
+        var message = "An user with the name " + user.getName() + " already exists";
 
-        when(service.add(any(UserForm.class))).thenThrow(new UserAlreadyExistsException(form.getName()));
+        when(service.add(any(User.class))).thenThrow(new UserAlreadyExistsException(user.getName()));
 
-        mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(form)))
-                .andDo(print())
+        mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user)))
                 .andExpect(status().isConflict())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserAlreadyExistsException))
                 .andExpect(result -> assertEquals(message, result.getResolvedException().getMessage()));
     }
 
+    @Test
+    @DisplayName("should update a new user")
+    void update() throws Exception {
+        var user = new User("Username", "https://www.example.com");
+        Mockito.doNothing().when(service).update(any(User.class));
+
+        mockMvc.perform(put("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user)))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("should not update a new user")
+    void failToUpdate() throws Exception {
+        var user = new User("Username", "avatar");
+        user.setId(1);
+
+        var message = "Could not found an user with id " + user.getId();
+        Mockito.doThrow(new UserNotFoundException(user.getId())).when(service).update(any(User.class));
+
+        mockMvc.perform(put("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user)))
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserNotFoundException))
+                .andExpect(result -> assertEquals(message, result.getResolvedException().getMessage()));
+    }
+
     private static String asJsonString(final Object obj) {
         try {
-            return new ObjectMapper().writeValueAsString(obj);
+            var objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            
+            return objectMapper.writeValueAsString(obj);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

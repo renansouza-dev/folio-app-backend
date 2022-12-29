@@ -1,52 +1,43 @@
 package com.renansouza.folio.user;
 
+import com.renansouza.folio.shared.Auditable;
 import com.renansouza.folio.utils.WordUtils;
-
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.validator.constraints.URL;
 
-import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "users")
-public class User implements Serializable {
+public class User extends Auditable<String> implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = -1362258531757232654L;
-
-    @Id
     @Getter
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-    @Getter
-    @Setter
+    @NotBlank
+    @Size(min = 5, max = 255)
     @Column(nullable = false)
     private String name;
 
     @Getter
     @Setter
     @Column
+    @URL(regexp = "^(https\\:\\/\\/)[a-z0-9\\.\\/\\S]+$")
     private String avatar;
-    @LastModifiedDate
-    private LocalDateTime registration;
-    @CreatedDate
-    private LocalDateTime modification;
 
-    public User(UserForm userForm) {
-        var now = LocalDateTime.now();
-        this.registration = now;
-        this.modification = now;
-
-        this.avatar = userForm.getAvatar();
-        this.name = WordUtils.capitalizeFully(userForm.getName());
+    public User(String name, String avatar) {
+        this.name = WordUtils.capitalizeFully(name);
+        this.avatar = avatar;
     }
+
+    public void setName(String name) {
+        this.name = WordUtils.capitalizeFully(name);
+    }
+
 }
