@@ -6,3 +6,13 @@ spring:
     url: jdbc:postgresql://localhost:5432/folio
     username: postgres
     password: postgres
+
+spring-doc:
+  version: '@springdoc.version@'
+  swagger-ui:
+    display-request-duration: true
+    groups-order: DESC
+    operationsSorter: method
+    disable-swagger-default-url: true
+    use-root-path: true
+  show-actuator: true

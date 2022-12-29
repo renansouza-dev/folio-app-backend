@@ -3,20 +3,22 @@ package com.renansouza.folio.user;
 import com.renansouza.folio.user.exception.UserAlreadyExistsException;
 import com.renansouza.folio.user.exception.UserNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@ApiResponses
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/user")
+@Tag(name = "user", description = "the user API")
 public class UserController {
 
     private final UserService service;
@@ -63,11 +65,13 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201", description = "User created",
-                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class))}),
+                    content = {@Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = User.class))}),
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "409", description = "User already saved")
     })
-    ResponseEntity<User> add(@RequestBody User user) throws UserAlreadyExistsException {
+    ResponseEntity<User> add(@Parameter(description = "Created user") @RequestBody User user) throws UserAlreadyExistsException {
         return new ResponseEntity<>(service.add(user), HttpStatus.CREATED);
     }
 

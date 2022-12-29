@@ -18,13 +18,13 @@ public class UserService {
         return repository.findAll();
     }
 
-    public User findById(long id) throws UserNotFoundException {
+    User findById(long id) throws UserNotFoundException {
         return repository
                 .findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public User add(User user) throws UserAlreadyExistsException {
+    User add(User user) throws UserAlreadyExistsException {
         if (repository.findByNameIgnoreCase(user.getName()).isPresent()) {
             throw new UserAlreadyExistsException(user.getName());
         }
@@ -37,19 +37,17 @@ public class UserService {
     }
 
     //TODO: Add a role or other solution to prevent account hijack
-    public void update(User user) throws UserNotFoundException {
-        var oldUserData = repository.findById(user.getId());
-        if (oldUserData.isEmpty()) {
-            throw new UserNotFoundException(user.getId());
-        }
+    void update(User user) throws UserNotFoundException {
+        var savedData = repository
+                .findById(user.getId())
+                .orElseThrow(() -> new UserNotFoundException(user.getId()));
 
         // Should validate if the object is really updated?
-        var newUserData = oldUserData.get();
-        newUserData.setName(user.getName());
-        newUserData.setAvatar(user.getAvatar());
-        newUserData.setLastModifiedDate(LocalDateTime.now());
+        savedData.setName(user.getName());
+        savedData.setAvatar(user.getAvatar());
+        savedData.setLastModifiedDate(LocalDateTime.now());
 
-        repository.save(newUserData);
+        repository.save(savedData);
     }
 
 }

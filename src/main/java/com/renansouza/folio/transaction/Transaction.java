@@ -4,50 +4,51 @@ import com.renansouza.folio.shared.Auditable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@SuperBuilder
+@Builder
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "transactions")
 public class Transaction extends Auditable<String> implements Serializable {
 
     @Getter
-    @Setter
+    @PastOrPresent
     @Column(nullable = false)
     private LocalDate date;
 
     @Getter
-    @Setter
+    @Future
     @Column(nullable = false)
     private LocalDate dueDate;
 
     @Getter
-    @Setter
+    @Positive
     @Column(nullable = false)
     private BigDecimal amount;
 
     @Getter
-    @Setter
+    @Positive
     @Column(nullable = false)
     private double quantity;
 
     @Getter
-    @Setter
     @Column(nullable = false)
     private BigDecimal revenue;
 
     @Getter
-    @Setter
+    @NotBlank
     @Column(nullable = false)
     private String classification;
+
 }

@@ -1,6 +1,5 @@
 package com.renansouza.folio.transaction;
 
-import com.renansouza.folio.user.User;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;

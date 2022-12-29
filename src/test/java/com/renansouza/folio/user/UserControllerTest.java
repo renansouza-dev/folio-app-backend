@@ -91,7 +91,7 @@ class UserControllerTest {
     @DisplayName("should add a new user")
     void add() throws Exception {
         when(service.add(any(User.class))).thenReturn(null);
-        var user = new User("User", null);
+        var user = new User("Username", null);
 
         mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user)))
                 .andExpect(status().isCreated());
@@ -100,7 +100,7 @@ class UserControllerTest {
     @Test
     @DisplayName("should not add a new user")
     void failToAdd() throws Exception {
-        var user = new User("User", "avatar");
+        var user = new User("Username", "avatar");
         var message = "An user with the name " + user.getName() + " already exists";
 
         when(service.add(any(User.class))).thenThrow(new UserAlreadyExistsException(user.getName()));
@@ -114,7 +114,7 @@ class UserControllerTest {
     @Test
     @DisplayName("should update a new user")
     void update() throws Exception {
-        var user = new User("Username", "avatar");
+        var user = new User("Username", "https://www.example.com");
         Mockito.doNothing().when(service).update(any(User.class));
 
         mockMvc.perform(put("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user)))

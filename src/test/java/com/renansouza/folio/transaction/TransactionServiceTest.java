@@ -37,9 +37,9 @@ class TransactionServiceTest {
         Mockito.when(repository.save(Mockito.any(Transaction.class))).thenReturn(getTransactionOutput());
 
         var transaction = service.add(getTransactionInput());
-        assertNotNull(transaction.getCreatedDate());
         assertNotNull(transaction.getLastModifiedDate());
         assertEquals(transaction.getQuantity(), 1);
+        assertEquals(transaction.getDate(), LocalDate.now());
         assertEquals(transaction.getAmount(), BigDecimal.TEN);
         assertEquals(transaction.getRevenue(), BigDecimal.TEN);
         assertEquals(transaction.getClassification(), CLASSIFICATION);
@@ -99,7 +99,6 @@ class TransactionServiceTest {
 
     private Transaction getTransactionOutput() {
         var transaction = getTransactionInput();
-        transaction.setId(1);
         transaction.setCreatedBy("auditor");
         transaction.setLastModifiedBy("auditor");
 

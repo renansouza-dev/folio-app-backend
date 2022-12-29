@@ -5,6 +5,7 @@ import com.renansouza.folio.transaction.exception.TransactionNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -13,7 +14,24 @@ public class TransactionService {
 
     private final TransactionRepository repository;
 
-    public Transaction add(Transaction transaction) {
+    void update(Transaction transaction) throws TransactionNotFoundException {
+        var savedData = repository
+                .findById(transaction.getId())
+                .orElseThrow(() -> new TransactionNotFoundException(transaction.getId()));
+
+        // Should validate if the object is really updated?
+        savedData.setDate(transaction.getDate());
+        savedData.setAmount(transaction.getAmount());
+        savedData.setRevenue(transaction.getRevenue());
+        savedData.setDueDate(transaction.getDueDate());
+        savedData.setQuantity(transaction.getQuantity());
+        savedData.setLastModifiedDate(LocalDateTime.now());
+        savedData.setClassification(transaction.getClassification());
+
+        repository.save(savedData);
+    }
+
+    Transaction add(Transaction transaction) {
         var auditor = new EntityAuditorAware().getCurrentAuditor();
 
         transaction.setCreatedBy(String.valueOf(auditor));
@@ -26,13 +44,13 @@ public class TransactionService {
         return repository.findAll();
     }
 
-    public Transaction findById(long id) throws TransactionNotFoundException {
+    Transaction findById(long id) throws TransactionNotFoundException {
         return repository
                 .findById(id)
                 .orElseThrow(() -> new TransactionNotFoundException(id));
     }
 
-    public List<Transaction> findByClassification(String classification) throws TransactionNotFoundException {
+    List<Transaction> findByClassification(String classification) throws TransactionNotFoundException {
         return repository
                 .findByClassificationIgnoreCase(classification)
                 .orElseThrow(() -> new TransactionNotFoundException(classification));
