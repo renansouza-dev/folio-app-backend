@@ -1,10 +1,7 @@
 package com.renansouza.folio.user;
 
-import com.renansouza.folio.shared.Auditable;
 import com.renansouza.folio.utils.WordUtils;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -17,7 +14,13 @@ import java.io.Serializable;
 @Entity
 @NoArgsConstructor
 @Table(name = "users")
-public class User extends Auditable<String> implements Serializable {
+public class User implements Serializable {
+
+    @Id
+    @Getter
+    @Setter
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
     @Getter
     @NotBlank

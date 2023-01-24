@@ -2,7 +2,7 @@ package com.renansouza.folio.user;
 
 import com.renansouza.folio.user.exception.UserAlreadyExistsException;
 import com.renansouza.folio.user.exception.UserNotFoundException;
-import com.renansouza.folio.utils.WordUtils;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,9 +12,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,32 +30,21 @@ class UserServiceTest {
     @Test
     @DisplayName("should find all users")
     void findAll() {
-        var user = new User("User", null);
-        List<User> users = Collections.singletonList(getUser());
+        var users = Instancio.ofList(User.class).create();
 
         when(repository.findAll()).thenReturn(users);
         var expected = service.findAll();
 
-        assertTrue(expected.iterator().hasNext());
-        assertEquals(expected.iterator().next().getName(), user.getName());
-    }
-
-    @Test
-    @DisplayName("should not find all users")
-    void notFindAll() {
-        when(repository.findAll()).thenReturn(Collections.emptyList());
-
-        var expected = service.findAll();
-
-        assertFalse(expected.iterator().hasNext());
+        assertNotNull(expected);
+        assertFalse(expected.isEmpty());
     }
 
     @Test
     @DisplayName("should find an user by id")
     void findById() {
-        var user = new User("User", null);
+        var user = Instancio.of(User.class).create();
 
-        when(repository.findById(anyLong())).thenReturn(Optional.of(getUser()));
+        when(repository.findById(anyLong())).thenReturn(Optional.of(user));
         var expected = service.findById(1L);
 
         assertEquals(expected.getName(), user.getName());
@@ -70,18 +56,17 @@ class UserServiceTest {
         long id = 1L;
         when(repository.findById(anyLong())).thenReturn(Optional.empty());
 
-        UserNotFoundException thrown = Assertions.assertThrows(UserNotFoundException.class, () -> service.findById(id));
+        var thrown = Assertions.assertThrows(UserNotFoundException.class, () -> service.findById(id));
         Assertions.assertEquals("Could not found an user with id " + id, thrown.getMessage());
     }
 
     @Test
     @DisplayName("should add an user")
     void add() {
-        var name = "User";
-        var user = new User(name, null);
+        var user = Instancio.of(User.class).create();
 
         when(repository.findByNameIgnoreCase(anyString())).thenReturn(Optional.empty());
-        when(repository.save(any(User.class))).thenReturn(getUser());
+        when(repository.save(any(User.class))).thenReturn(user);
 
         var expected = service.add(user);
         assertEquals(expected.getName(), user.getName());
@@ -90,26 +75,24 @@ class UserServiceTest {
     @Test
     @DisplayName("should not add an user")
     void notAdd() {
-        var name = "User";
-        var user = new User(name, null);
+        var user = Instancio.of(User.class).create();
 
-        when(repository.findByNameIgnoreCase(anyString())).thenReturn(Optional.of(getUser()));
+        when(repository.findByNameIgnoreCase(anyString())).thenReturn(Optional.of(user));
 
         var thrown = Assertions.assertThrows(UserAlreadyExistsException.class, () -> service.add(user));
-        Assertions.assertEquals("An user with the name " + name + " already exists", thrown.getMessage());
+        Assertions.assertEquals("An user with the name " + user.getName() + " already exists", thrown.getMessage());
     }
 
     @Test
     @DisplayName("should update an user")
     void update() {
-        var newUserData = getUser();
-        newUserData.setName("New User");
-        newUserData.setLastModifiedDate(LocalDateTime.now());
+        var user = Instancio.of(User.class).create();
+        user.setName("New User");
 
-        when(repository.findById(anyLong())).thenReturn(Optional.of(getUser()));
-        when(repository.save(any(User.class))).thenReturn(newUserData);
+        when(repository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(repository.save(any(User.class))).thenReturn(user);
 
-        service.update(newUserData);
+        service.update(user);
 
         Mockito.verify(repository, Mockito.times(1)).save(any(User.class));
     }
@@ -117,24 +100,12 @@ class UserServiceTest {
     @Test
     @DisplayName("should not update an users")
     void notUpdate() {
-        var newUserData = getUser();
-        newUserData.setName("New User");
-        newUserData.setLastModifiedDate(LocalDateTime.now());
+        var user = Instancio.of(User.class).create();
 
         when(repository.findById(anyLong())).thenReturn(Optional.empty());
 
-        var thrown = Assertions.assertThrows(UserNotFoundException.class, () -> service.update(newUserData));
-        Assertions.assertEquals("Could not found an user with id " + newUserData.getId(), thrown.getMessage());
-    }
-
-    private User getUser() {
-        var user = new User();
-        user.setAvatar("avatar");
-        user.setCreatedBy("auditor");
-        user.setLastModifiedBy("auditor");
-        user.setName(WordUtils.capitalizeFully("User"));
-
-        return user;
+        var thrown = Assertions.assertThrows(UserNotFoundException.class, () -> service.update(user));
+        Assertions.assertEquals("Could not found an user with id " + user.getId(), thrown.getMessage());
     }
 
 }

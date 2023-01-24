@@ -14,6 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WordUtilsTest {
 
+    private static Stream<Arguments> arguments() {
+        return Stream.of(
+                Arguments.of("spring boot"),
+                Arguments.of("SPRING BOOT"),
+                Arguments.of("sPRING bOOT"),
+                Arguments.of("spring Boot")
+        );
+    }
+
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {"  ", "\t", "\n"})
@@ -25,15 +34,6 @@ class WordUtilsTest {
     @MethodSource("arguments")
     void capitalizeFully(String input) {
         assertEquals("Spring Boot", WordUtils.capitalizeFully(input));
-    }
-
-    private static Stream<Arguments> arguments() {
-        return Stream.of(
-                Arguments.of("spring boot"),
-                Arguments.of("SPRING BOOT"),
-                Arguments.of("sPRING bOOT"),
-                Arguments.of("spring Boot")
-        );
     }
 
 }

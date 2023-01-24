@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/user")
@@ -28,10 +30,10 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200", description = "Successful operation",
-                    content = {@Content(schema = @Schema(implementation = User.class))}),
+                    content = {@Content(schema = @Schema(implementation = User[].class))}),
             @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    ResponseEntity<Iterable<User>> all() {
+    ResponseEntity<List<User>> all() {
         return ResponseEntity.ok().body(service.findAll());
     }
 

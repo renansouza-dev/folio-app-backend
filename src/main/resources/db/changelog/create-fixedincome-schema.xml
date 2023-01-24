@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.17.xsd">
 
-    <changeSet author="renan" id="2-1">
-        <createTable tableName="transactions">
+    <changeSet author="renan" id="1-1">
+        <createTable tableName="fixed_incomes">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="created_by" type="VARCHAR(255)">
+            <column name="brokerage" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_date" type="DATETIME">
+            <column name="emitter" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_modified_by" type="VARCHAR(255)">
+            <column name="forma" type="VARCHAR(10)">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_modified_date" type="DATETIME">
+            <column name="amount" type="NUMERIC">
                 <constraints nullable="false"/>
             </column>
             <column name="date" type="DATE">
@@ -28,16 +28,16 @@
             <column name="due_date" type="DATE">
                 <constraints nullable="false"/>
             </column>
-            <column name="amount" type="NUMERIC">
+            <column name="index" type="VARCHAR(4)">
                 <constraints nullable="false"/>
             </column>
-            <column name="quantity" type="REAL">
+            <column name="rate" type="REAL">
                 <constraints nullable="false"/>
             </column>
-            <column name="revenue" type="NUMERIC">
+            <column name="withdraw_date" type="DATE">
                 <constraints nullable="false"/>
             </column>
-            <column name="classification" type="VARCHAR(255)">
+            <column name="currency" type="VARCHAR(3)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

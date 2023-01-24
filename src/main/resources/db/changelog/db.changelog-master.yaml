@@ -2,4 +2,4 @@ databaseChangeLog:
   - include:
       file: db/changelog/create-user-schema.xml
   - include:
-      file: db/changelog/create-transaction-schema.xml
+      file: db/changelog/create-fixedincome-schema.xml

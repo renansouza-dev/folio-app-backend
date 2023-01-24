@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
+import java.util.Objects;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,6 +44,17 @@ class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    private static String asJsonString(final Object obj) {
+        try {
+            var objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @BeforeEach
     public void setup() {
@@ -72,7 +84,7 @@ class UserControllerTest {
         mockMvc.perform(get("/user/" + id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserNotFoundException))
-                .andExpect(result -> assertEquals(message, result.getResolvedException().getMessage()));
+                .andExpect(result -> assertEquals(message, Objects.requireNonNull(result.getResolvedException()).getMessage()));
     }
 
     @Test
@@ -108,7 +120,7 @@ class UserControllerTest {
         mockMvc.perform(post("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user)))
                 .andExpect(status().isConflict())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserAlreadyExistsException))
-                .andExpect(result -> assertEquals(message, result.getResolvedException().getMessage()));
+                .andExpect(result -> assertEquals(message, Objects.requireNonNull(result.getResolvedException()).getMessage()));
     }
 
     @Test
@@ -133,17 +145,6 @@ class UserControllerTest {
         mockMvc.perform(put("/user").contentType(MediaType.APPLICATION_JSON).content(asJsonString(user)))
                 .andExpect(status().isNotFound())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof UserNotFoundException))
-                .andExpect(result -> assertEquals(message, result.getResolvedException().getMessage()));
-    }
-
-    private static String asJsonString(final Object obj) {
-        try {
-            var objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new JavaTimeModule());
-            
-            return objectMapper.writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+                .andExpect(result -> assertEquals(message, Objects.requireNonNull(result.getResolvedException()).getMessage()));
     }
 }

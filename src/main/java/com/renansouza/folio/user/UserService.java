@@ -1,12 +1,11 @@
 package com.renansouza.folio.user;
 
-import com.renansouza.folio.shared.EntityAuditorAware;
 import com.renansouza.folio.user.exception.UserAlreadyExistsException;
 import com.renansouza.folio.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -14,7 +13,7 @@ public class UserService {
 
     private final UserRepository repository;
 
-    Iterable<User> findAll() {
+    List<User> findAll() {
         return repository.findAll();
     }
 
@@ -29,10 +28,6 @@ public class UserService {
             throw new UserAlreadyExistsException(user.getName());
         }
 
-        var auditor = new EntityAuditorAware().getCurrentAuditor();
-        user.setCreatedBy(String.valueOf(auditor));
-        user.setLastModifiedBy(String.valueOf(auditor));
-
         return repository.save(user);
     }
 
@@ -45,7 +40,6 @@ public class UserService {
         // Should validate if the object is really updated?
         savedData.setName(user.getName());
         savedData.setAvatar(user.getAvatar());
-        savedData.setLastModifiedDate(LocalDateTime.now());
 
         repository.save(savedData);
     }
