@@ -1,0 +1,9 @@
+CREATE TABLE users (
+  uuid UUID NOT NULL,
+   name VARCHAR(30) NOT NULL,
+   email VARCHAR(255) NOT NULL,
+   image_url VARCHAR(255),
+   CONSTRAINT pk_users PRIMARY KEY (uuid)
+);
+
+ALTER TABLE users ADD CONSTRAINT uc_74165e195b2f7b25de690d14a UNIQUE (email);

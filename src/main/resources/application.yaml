@@ -1,0 +1,24 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+      show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/folio
+    username: postgres
+    password: postgres
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: ${GOOGLE_CLIENT_ID}
+            clientSecret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - openid
+              - email
+              - profile
