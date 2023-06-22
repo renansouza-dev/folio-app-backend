@@ -1,8 +1,8 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   uuid UUID NOT NULL,
    name VARCHAR(30) NOT NULL,
    email VARCHAR(255) NOT NULL,
-   image_url VARCHAR(255),
+   picture VARCHAR(255),
    CONSTRAINT pk_users PRIMARY KEY (uuid)
 );
 

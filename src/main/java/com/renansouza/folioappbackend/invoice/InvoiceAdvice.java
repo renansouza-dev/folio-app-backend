@@ -1,4 +1,4 @@
-package com.renansouza.folioappbackend.user;
+package com.renansouza.folioappbackend.invoice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +13,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class UserAdvice extends ResponseEntityExceptionHandler {
+public class InvoiceAdvice extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex, WebRequest request) {
+    @ExceptionHandler(InvoiceNotFoundException.class)
+    public ResponseEntity<Object> handleInvoiceNotFoundException(InvoiceNotFoundException ex, WebRequest request) {
 
         var path = ((ServletWebRequest) request).getRequest().getRequestURI();
         Map<String, Object> body = new LinkedHashMap<>();

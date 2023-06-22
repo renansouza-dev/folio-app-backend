@@ -1,7 +1,6 @@
 package com.renansouza.folioappbackend.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,18 +13,31 @@ public class UserService {
 
     private final UserRepository repository;
 
-    @Transactional
-    User findById(UUID uuid) {
-        return repository.findById(uuid).orElseThrow(UserNotFoundException::new);
+    UserRecord findById(UUID uuid) {
+        return repository.findUserRecordByUuid(uuid).orElseThrow(UserNotFoundException::new);
+    }
+
+    UserRecord findMe(String email) {
+        var optionalUser = repository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            var user = optionalUser.get();
+            return new UserRecord(user.getUuid(), user.getName(), user.getEmail(), user.getPicture());
+        }
+
+        throw new UserNotFoundException();
     }
 
     @Transactional
-    public void save(OidcUser oidcUser) {
-        var newUser = new User(oidcUser);
+    public void save(User newUser) {
         var savedUser = repository.findByEmail(newUser.getEmail());
         if (savedUser.isPresent()) {
             if (!savedUser.get().equals(newUser)) {
-                repository.update(newUser);
+                var updatedUser = savedUser.get();
+                updatedUser.setName(newUser.getName());
+                updatedUser.setEmail(newUser.getEmail());
+                updatedUser.setPicture(newUser.getPicture());
+
+                repository.update(updatedUser);
             }
         } else {
             repository.persist(newUser);

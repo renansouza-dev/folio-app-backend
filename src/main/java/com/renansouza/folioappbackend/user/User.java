@@ -1,5 +1,6 @@
 package com.renansouza.folioappbackend.user;
 
+import com.renansouza.folioappbackend.invoice.Invoice;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import org.hibernate.type.SqlTypes;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -32,11 +34,14 @@ public class User {
     @Column(nullable = false)
     private String email;
 
-    private String imageUrl;
+    private String picture;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Invoice> invoices;
 
     public User(OidcUser oidcUser) {
         this.name = oidcUser.getFullName().toUpperCase().trim();
-        this.imageUrl = oidcUser.getPicture();
+        this.picture = oidcUser.getPicture();
         this.email = oidcUser.getEmail();
     }
 
@@ -47,11 +52,11 @@ public class User {
         User user = (User) o;
         return Objects.equals(name, user.name)
                 && Objects.equals(email, user.email)
-                && Objects.equals(imageUrl, user.imageUrl);
+                && Objects.equals(picture, user.picture);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, email, imageUrl);
+        return Objects.hash(name, email, picture);
     }
 }

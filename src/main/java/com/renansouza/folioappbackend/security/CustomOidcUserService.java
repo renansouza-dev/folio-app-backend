@@ -1,5 +1,6 @@
 package com.renansouza.folioappbackend.security;
 
+import com.renansouza.folioappbackend.user.User;
 import com.renansouza.folioappbackend.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -22,7 +23,9 @@ public class CustomOidcUserService extends OidcUserService {
         OidcUser oidcUser = super.loadUser(userRequest);
 
         try {
-            userService.save(oidcUser);
+            var user = new User(oidcUser);
+            userService.save(user);
+
             return oidcUser;
         } catch (AuthenticationException ex) {
             throw ex;
