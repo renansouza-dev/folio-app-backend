@@ -1,6 +1,6 @@
 package com.renansouza.folioappbackend.user;
 
-import com.renansouza.folioappbackend.invoice.Invoice;
+import com.renansouza.folioappbackend.invoice.models.entities.Invoice;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
