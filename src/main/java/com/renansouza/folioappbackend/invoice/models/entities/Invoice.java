@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
@@ -28,6 +29,7 @@ import static java.math.BigDecimal.ZERO;
 public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @Column(nullable = false)
@@ -97,21 +99,19 @@ public class Invoice {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = (o instanceof HibernateProxy proxy) ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = (this instanceof HibernateProxy proxy) ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
         Invoice invoice = (Invoice) o;
-        return Objects.equals(date, invoice.date)
-                && Objects.equals(broker, invoice.broker)
-                && Objects.equals(total, invoice.total)
-                && Objects.equals(fees, invoice.fees)
-                && Objects.equals(settlement, invoice.settlement)
-                && Objects.equals(net, invoice.net);
+        return getId() != null && Objects.equals(getId(), invoice.getId());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(date, broker, total, fees, settlement, net);
+    public final int hashCode() {
+        return getClass().hashCode();
     }
 
 }

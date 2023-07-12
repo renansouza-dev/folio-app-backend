@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ public class UserController {
 
     private final UserService service;
 
+    @Cacheable("users")
     @GetMapping(path = "/user/{uuid}")
     @Operation(summary = "Get one user by its uuid")
     @ApiResponses(value = {
@@ -33,6 +35,7 @@ public class UserController {
         return service.findById(uuid);
     }
 
+    @Cacheable("me")
     @GetMapping("/user/me")
     @Operation(summary = "Get one user by its uuid")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "The user",

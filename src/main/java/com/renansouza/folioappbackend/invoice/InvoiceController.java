@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +25,7 @@ public class InvoiceController {
 
     private final InvoiceService service;
 
+    @CachePut(value = "invoices", key = "#result.id")
     @PostMapping("/invoice")
     @Operation(summary = "Add a new invoice to a user invoice list")
     @ApiResponses(value = {
@@ -32,6 +36,7 @@ public class InvoiceController {
         return service.save(invoiceRequest);
     }
 
+    @Cacheable("usersInvoices")
     @GetMapping("/invoices/{uuid}")
     @Operation(summary = "Find all invoices for the given user UUID")
     @ApiResponses(value = {
@@ -42,6 +47,7 @@ public class InvoiceController {
         return service.findByUserUuid(uuid);
     }
 
+    @Cacheable("invoices")
     @GetMapping("/invoice/{id}")
     @Operation(summary = "Find one invoice for the given ID")
     @ApiResponses(value = {
@@ -52,6 +58,7 @@ public class InvoiceController {
         return service.findById(id);
     }
 
+    @CacheEvict(value = "invoices", key = "#id")
     @DeleteMapping("/invoice/{id}")
     @Operation(summary = "Delete an invoice from the given ID")
     @ApiResponses(value = {

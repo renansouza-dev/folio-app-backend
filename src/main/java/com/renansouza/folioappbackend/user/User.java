@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.type.SqlTypes;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
@@ -46,17 +47,18 @@ public class User {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = (o instanceof HibernateProxy proxy) ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = (this instanceof HibernateProxy proxy) ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
         User user = (User) o;
-        return Objects.equals(name, user.name)
-                && Objects.equals(email, user.email)
-                && Objects.equals(picture, user.picture);
+        return getUuid() != null && Objects.equals(getUuid(), user.getUuid());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(name, email, picture);
+    public final int hashCode() {
+        return getClass().hashCode();
     }
 }
