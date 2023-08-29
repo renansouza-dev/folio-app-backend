@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +29,8 @@ public class InvoiceService {
                 .orElseThrow(InvoiceNotFoundException::new);
     }
 
-    List<InvoiceResponse> findByUserUuid(UUID uuid) {
-        return repository.findByUserUuid(uuid);
+    List<InvoiceResponse> findByUser(String email) {
+        return repository.findByUserEmail(email);
     }
 
     void delete(Long id) {

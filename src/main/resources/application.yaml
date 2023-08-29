@@ -3,10 +3,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        show-sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
-      show-sql: true
   datasource:
     url: jdbc:postgresql://localhost:5432/folio
     username: postgres

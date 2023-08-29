@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 public record InvoiceDetailRecord(
         @NotBlank
-        @Size(min = 6, max = 6)
+        @Size(min = 5, max = 6)
         String asset,
         @NotBlank
         InvoiceOperation operation,

@@ -14,19 +14,33 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
+@RequestMapping("/invoices")
 @RequiredArgsConstructor
 public class InvoiceController {
 
     private final InvoiceService service;
 
+    @Cacheable("usersInvoices")
+    @GetMapping
+    @Operation(summary = "Find all invoices for the given user UUID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "All invoices founded",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = InvoiceResponse.class)))),
+            @ApiResponse(responseCode = "404", description = "No invoices found for the given user")})
+    List<InvoiceResponse> findByUserUuid(Principal principal) {
+        var email = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("email");
+        return service.findByUser(String.valueOf(email));
+    }
+
     @CachePut(value = "invoices", key = "#result.id")
-    @PostMapping("/invoice")
+    @PostMapping
     @Operation(summary = "Add a new invoice to a user invoice list")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The invoice",
@@ -36,19 +50,8 @@ public class InvoiceController {
         return service.save(invoiceRequest);
     }
 
-    @Cacheable("usersInvoices")
-    @GetMapping("/invoices/{uuid}")
-    @Operation(summary = "Find all invoices for the given user UUID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "All invoices founded",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = InvoiceResponse.class)))),
-            @ApiResponse(responseCode = "404", description = "No invoices found for the given user")})
-    List<InvoiceResponse> findByUserUuid(@PathVariable("uuid") UUID uuid) {
-        return service.findByUserUuid(uuid);
-    }
-
     @Cacheable("invoices")
-    @GetMapping("/invoice/{id}")
+    @GetMapping("/{id}")
     @Operation(summary = "Find one invoice for the given ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "One invoice founded",
@@ -59,7 +62,7 @@ public class InvoiceController {
     }
 
     @CacheEvict(value = "invoices", key = "#id")
-    @DeleteMapping("/invoice/{id}")
+    @DeleteMapping("/{id}")
     @Operation(summary = "Delete an invoice from the given ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "The invoice was successfully deleted"),

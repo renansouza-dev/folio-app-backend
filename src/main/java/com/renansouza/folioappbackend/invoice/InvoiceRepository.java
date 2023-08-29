@@ -8,13 +8,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public interface InvoiceRepository extends BaseJpaRepository<Invoice, Long> {
 
-    List<InvoiceResponse> findByUserUuid(@Param("uuid") UUID uuid);
+    List<InvoiceResponse> findByUserEmail(@Param("email") String email);
 
     Optional<InvoiceResponse> findInvoiceById(@Param("id") Long id);
+
+
 
 }
