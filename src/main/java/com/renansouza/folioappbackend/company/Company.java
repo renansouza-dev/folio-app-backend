@@ -18,7 +18,7 @@ import java.util.Objects;
 @Table(name = "companies", indexes = {
         @Index(name = "fn_index", columnList = "cnpj")
 }, uniqueConstraints = {
-        @UniqueConstraint(name = "UniqueNameAndCnpj", columnNames = {"name", "cnpj"})
+        @UniqueConstraint(name = "UniqueLegalNameAndCnpj", columnNames = {"legal_name", "cnpj"})
 })
 public class Company {
 
@@ -26,15 +26,15 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Size(min = 5, max = 30)
-    @Column(nullable = false)
-    private String name;
+    @Size(min = 5, max = 75)
+    @Column(name = "legal_name", nullable = false)
+    private String legalName;
 
     @Size(min = 14, max = 14)
     @Column(nullable = false)
     private String cnpj;
 
-    @Column(name = "tickers", nullable = false)
+    @Column(nullable = false)
     private List<String> tickers;
 
     @Column(nullable = false)
@@ -44,11 +44,11 @@ public class Company {
     private boolean listed;
 
     public Company(CompanyRequest companyRequest) {
-        this.name = companyRequest.name();
         this.cnpj = companyRequest.cnpj();
         this.broker = companyRequest.broker();
         this.listed = companyRequest.listed();
         this.tickers = companyRequest.tickers();
+        this.legalName = companyRequest.legalName();
     }
 
     @Override

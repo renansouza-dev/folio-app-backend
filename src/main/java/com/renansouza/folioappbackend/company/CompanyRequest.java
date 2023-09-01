@@ -8,8 +8,8 @@ import java.util.List;
 
 public record CompanyRequest(
         @NotBlank
-        @Size(min = 5, max = 30)
-        String name,
+        @Size(min = 5, max = 75)
+        String legalName,
         @NotBlank
         @Size(min = 14, max = 14)
         String cnpj,
@@ -19,10 +19,11 @@ public record CompanyRequest(
         boolean listed
 ) {
         public CompanyRequest {
-                name = name.toUpperCase();
+                legalName = legalName.toUpperCase().trim();
                 cnpj = cnpj.replaceAll("\\D+", "");
                 tickers = tickers.stream()
                         .map(String::toUpperCase)
+                        .map(String::trim)
                         .toList();
         }
 }
