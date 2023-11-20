@@ -1,0 +1,10 @@
+# JPA and Datasource configuration settings
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/folio
+    username: postgres
+    password: postgres

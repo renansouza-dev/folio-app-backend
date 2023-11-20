@@ -1,13 +1,13 @@
-package folioappbackend;
+package com.renansouza.folioappbackend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FolioAppBackendApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FolioAppBackendApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }
