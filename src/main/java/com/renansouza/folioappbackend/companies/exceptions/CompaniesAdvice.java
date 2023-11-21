@@ -1,4 +1,4 @@
-package com.renansouza.folioappbackend.invoice;
+package com.renansouza.folioappbackend.companies.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,19 +13,28 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class InvoiceAdvice extends ResponseEntityExceptionHandler {
+public class CompaniesAdvice extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(InvoiceNotFoundException.class)
-    public ResponseEntity<Object> handleInvoiceNotFoundException(InvoiceNotFoundException ex, WebRequest request) {
+    @ExceptionHandler(CompaniesNotFoundException.class)
+    ResponseEntity<Object> handleCompaniesNotFoundException(CompaniesNotFoundException ex, WebRequest request) {
+        return buildException(ex, request, HttpStatus.NOT_FOUND);
+    }
 
+    @ExceptionHandler(CompaniesAlreadyExistsException.class)
+    ResponseEntity<Object> handleAlreadyException(CompaniesAlreadyExistsException ex, WebRequest request) {
+        return buildException(ex, request, HttpStatus.CONFLICT);
+    }
+
+    private ResponseEntity<Object> buildException(RuntimeException ex, WebRequest request, HttpStatus status) {
         var path = ((ServletWebRequest) request).getRequest().getRequestURI();
+
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
         body.put("path", path);
-        body.put("code", HttpStatus.NOT_FOUND);
+        body.put("code", status);
 
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(body, status);
     }
 
 }

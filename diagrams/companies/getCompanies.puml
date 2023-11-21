@@ -1,0 +1,21 @@
+@startuml
+autonumber
+actor    Actor    as user
+participant Backend as backend
+user -> backend: Authentication Request
+backend -> user: Authentication Response
+group Perform Get Companies
+  user -> backend: << Create Request >>
+  activate backend
+  database Database as database
+  activate database
+  backend -> database: << Perform query >>
+  database -> backend: << Handle results >>
+  deactivate database
+  alt #Aquamarine Successful case - 200 OK
+    backend -> user: Found at least one company
+  else #Pink Unsuccessful case - 204 No Content
+    backend -> user: No company found
+  deactivate backend
+end
+@enduml

@@ -1,6 +1,11 @@
 version: '3.8'
 
 services:
+  app:
+    image: folio-app-backend:0.0.1-SNAPSHOT
+    container_name: folio-app-backend
+    ports:
+      - "8080:8080"
   db:
     image: postgres
     container_name: postgres
