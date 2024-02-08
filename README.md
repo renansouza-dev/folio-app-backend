@@ -13,6 +13,11 @@ Persistence
 Devops
 * [GitHub Actions](https://docs.github.com/en/actions)
 
+# Build from source
+```shell
+docker image build -t renansouza/folio-app-backend .
+```
+
 # How to run
 ```shell
 docker compose up -d

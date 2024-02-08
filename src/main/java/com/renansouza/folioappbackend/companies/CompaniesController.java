@@ -1,14 +1,13 @@
 package com.renansouza.folioappbackend.companies;
 
 import com.renansouza.folioappbackend.companies.models.CompaniesRequest;
-import com.renansouza.folioappbackend.companies.models.CompaniesResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.UUID;
 
 @RestController
@@ -21,8 +20,14 @@ public class CompaniesController {
     @GetMapping
     ResponseEntity<Object> getCompanies(@RequestParam(required = false) UUID id,
                                         @RequestParam(required = false) String cnpj,
-                                        @RequestParam(required = false, defaultValue = "20") String pageSize) {
-        var companies = companiesService.getCompanies(id, cnpj, pageSize);
+                                        @RequestParam(required = false, defaultValue = "20") String pageSize,
+                                        @RequestParam(required = false, defaultValue = "name") String property,
+                                        @RequestParam(required = false, defaultValue = "asc") String direction) {
+
+        var sort = Sort.by(Sort.Direction.fromString(direction), property);
+        var page = PageRequest.of(0, Integer.parseInt(pageSize), sort);
+
+        var companies = companiesService.getCompanies(id, cnpj, page);
         return companies.isEmpty()
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.ok(companies);

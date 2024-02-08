@@ -1,6 +1,6 @@
 CREATE TABLE companies (
   uuid UUID NOT NULL,
-   name VARCHAR(75) NOT NULL,
+   name VARCHAR(85) NOT NULL,
    cnpj VARCHAR(14) NOT NULL,
    broker BOOLEAN NOT NULL,
    listed BOOLEAN NOT NULL,

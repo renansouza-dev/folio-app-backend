@@ -37,7 +37,7 @@ public class CompaniesEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
-    @Size(min = 5, max = 75)
+    @Size(min = 5, max = 85)
     @Column(name = "name", nullable = false)
     private String name;
 
