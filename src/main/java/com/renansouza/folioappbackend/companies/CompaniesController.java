@@ -48,7 +48,7 @@ public class CompaniesController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteCompany(@PathVariable UUID id) {
-        companiesService.deleteCompany(id);
+        companiesService.deleteCompanies(id);
     }
 
 }

@@ -48,7 +48,7 @@ public class CompaniesService {
         companiesRepository.save(entity);
     }
 
-    void deleteCompany(UUID id) {
+    void deleteCompanies(UUID id) {
         var entity = companiesRepository
                 .findById(id)
                 .orElseThrow(CompaniesNotFoundException::new);

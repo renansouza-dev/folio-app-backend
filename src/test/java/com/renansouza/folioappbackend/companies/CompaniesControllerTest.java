@@ -1,210 +1,144 @@
 package com.renansouza.folioappbackend.companies;
 
-import com.renansouza.folioappbackend.Application;
-import com.renansouza.folioappbackend.companies.models.CompaniesEntity;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.renansouza.folioappbackend.companies.exceptions.CompaniesAlreadyExistsException;
+import com.renansouza.folioappbackend.companies.exceptions.CompaniesNotFoundException;
 import com.renansouza.folioappbackend.companies.models.CompaniesRequest;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.instancio.Instancio;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.http.HttpStatus;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
-import static io.restassured.RestAssured.given;
-import static org.instancio.Select.all;
-import static org.instancio.Select.field;
+import static com.renansouza.folioappbackend.companies.Companies.getCompaniesRequest;
+import static com.renansouza.folioappbackend.companies.Companies.getCompaniesResponse;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Testcontainers
-@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@WebMvcTest(CompaniesController.class)
 class CompaniesControllerTest {
 
-    private CompaniesRequest companiesRequest;
-    @LocalServerPort
-    private Integer port;
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
-
-    @BeforeAll
-    static void beforeAll() {
-        postgres.start();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        postgres.stop();
-    }
+    private static final String PATH = "/v1/companies";
 
     @Autowired
-    CompaniesRepository companiesRepository;
+    ObjectMapper mapper;
 
-    @BeforeEach
-    void setUp() {
-        RestAssured.baseURI = "http://localhost:" + port + "/v1/companies";
-        companiesRequest = Instancio.of(CompaniesRequest.class)
-                                    .set(field(CompaniesRequest::cnpj), "00000000000100")
-                                    .create();
-    }
+    @Autowired
+    MockMvc mockMvc;
 
-    @AfterEach
-    void tearDown() {
-        companiesRepository.deleteAll();
+    @MockBean
+    CompaniesService service;
+
+    @Test
+    public void getAllCompanies() throws Exception {
+        // given - precondition or setup
+        var companiesResponse = getCompaniesResponse();
+        when(service.getCompanies(any(), any(), any())).thenReturn(new PageImpl<>(List.of(companiesResponse)));
+
+        // when - action or the behaviour that we are going test
+        // then - verify the output
+        mockMvc.perform(get(PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(this.mapper.writeValueAsString(getCompaniesRequest())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$.last", is(true)))
+                .andExpect(jsonPath("$.totalPages", is(1)))
+                .andExpect(jsonPath("$.totalElements", is(1)))
+                .andExpect(jsonPath("$.content", notNullValue()))
+                .andExpect(jsonPath("$.content.[0].id", is(companiesResponse.id().toString())))
+                .andExpect(jsonPath("$.content.[0].name", is(companiesResponse.name())))
+                .andExpect(jsonPath("$.content.[0].cnpj", is(companiesResponse.cnpj())))
+                .andExpect(jsonPath("$.content.[0].broker", is(companiesResponse.broker())))
+                .andExpect(jsonPath("$.content.[0].listed", is(companiesResponse.listed())));
     }
 
     @Test
-    @DisplayName("find all successfully")
-    void findAll() {
-        var company = Instancio.of(CompaniesEntity.class)
-                .ignore(all(UUID.class))
-                .set(field(CompaniesEntity::getCnpj), companiesRequest.cnpj())
-                .create();
+    public void getNoCompanies() throws Exception {
+        // given - precondition or setup
+        when(service.getCompanies(any(), any(), any())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        companiesRepository.save(company);
-
-        given()
-                .contentType(ContentType.JSON)
-                .when()
-                .get()
-                .then()
-                .statusCode(HttpStatus.OK.value());
+        // when - action or the behaviour that we are going test
+        // then - verify the output
+        mockMvc.perform(get(PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(this.mapper.writeValueAsString(getCompaniesRequest())))
+                .andExpect(status().isNoContent());
     }
 
     @Test
-    @DisplayName("find all successfully by cnpj")
-    void findAllByCnpj() {
-        var company = Instancio.of(CompaniesEntity.class)
-                .ignore(all(UUID.class))
-                .set(field(CompaniesEntity::getCnpj), companiesRequest.cnpj())
-                .create();
+    public void failToCreateCompany() throws Exception {
+        // given - precondition or setup
+        doThrow(new CompaniesAlreadyExistsException()).when(service).createCompanies(any(CompaniesRequest.class));
 
-        companiesRepository.save(company);
-
-        given()
-                .contentType(ContentType.JSON)
-                .given()
-                .queryParam("cnpj", companiesRequest.cnpj())
-                .when()
-                .get()
-                .then()
-                .statusCode(HttpStatus.OK.value());
+        // when - action or the behaviour that we are going test
+        // then - verify the output
+        mockMvc.perform(post(PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(this.mapper.writeValueAsString(getCompaniesRequest())))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$.code", is("CONFLICT")))
+                .andExpect(jsonPath("$.message", is("A company with the provided data already exists.")));
     }
 
     @Test
-    @DisplayName("no company found")
-    void noCompanyFound() {
-        given()
-               .contentType(ContentType.JSON)
-               .when()
-               .get()
-               .then()
-               .statusCode(HttpStatus.NO_CONTENT.value());
+    public void failToUpdateCompany() throws Exception {
+        // given - precondition or setup
+        doThrow(new CompaniesNotFoundException())
+                .when(service).updateCompanies(any(UUID.class), any(CompaniesRequest.class));
+
+        // when - action or the behaviour that we are going test
+        // then - verify the output
+        mockMvc.perform(patch(PATH + "/{id}", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(this.mapper.writeValueAsString(getCompaniesRequest())))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$.code", is("NOT_FOUND")))
+                .andExpect(jsonPath("$.message", is("No company found with provided id.")));
     }
 
     @Test
-    @DisplayName("save successfully")
-    void save() {
-        given()
-                .contentType(ContentType.JSON)
-                .body(companiesRequest)
-                .when()
-                .post()
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
+    public void deleteCompany() throws Exception {
+        // given - precondition or setup
+        willDoNothing().given(service).deleteCompanies(any(UUID.class));
+
+        // when - action or the behaviour that we are going test
+        // then - verify the output
+        mockMvc.perform(delete(PATH + "/{id}", UUID.randomUUID()))
+                .andExpect(status().isNoContent());
     }
 
     @Test
-    @DisplayName("fail to save when cnpj already exists")
-    void failToSave() {
-        var company = Instancio.of(CompaniesEntity.class)
-                .ignore(all(UUID.class))
-                .set(field(CompaniesEntity::getCnpj), companiesRequest.cnpj())
-                .create();
+    public void failToDeleteCompany() throws Exception {
+        // given - precondition or setup
+        doThrow(new CompaniesNotFoundException()).when(service).deleteCompanies(any(UUID.class));
 
-        companiesRepository.save(company);
-
-        given()
-                .contentType(ContentType.JSON)
-                .body(companiesRequest)
-                .when()
-                .post()
-                .then()
-                .statusCode(HttpStatus.CONFLICT.value());
-    }
-
-    @Test
-    @DisplayName("update successfully")
-    void update() {
-        var entity = Instancio.of(CompaniesEntity.class)
-                .ignore(all(UUID.class))
-                .create();
-
-        var companyId = companiesRepository.save(entity).getUuid();
-
-        var newCompany = Instancio.create(CompaniesRequest.class);
-
-        given()
-                .contentType(ContentType.JSON)
-                .body(newCompany)
-                .when()
-                .patch("/{id}", companyId)
-                .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-    }
-
-    @Test
-    @DisplayName("fail to update when uuid not found")
-    void failToUpdate() {
-        var newCompany = Instancio.create(CompaniesRequest.class);
-
-        given()
-                .contentType(ContentType.JSON)
-                .body(newCompany)
-                .when()
-                .patch("/{id}", UUID.randomUUID())
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
-    }
-
-    @Test
-    @DisplayName("successfully delete")
-    void delete() {
-        var entity = Instancio.of(CompaniesEntity.class)
-                .ignore(all(UUID.class))
-                .create();
-
-        var companyId = companiesRepository.save(entity).getUuid();
-
-        given()
-                .contentType(ContentType.JSON)
-                .when()
-                .delete("/{id}", companyId)
-                .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-    }
-
-    @Test
-    @DisplayName("fail to delete when uuid not found")
-    void failToDelete() {
-        given()
-                .contentType(ContentType.JSON)
-                .when()
-                .delete("/{id}", UUID.randomUUID())
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+        // when - action or the behaviour that we are going test
+        // then - verify the output
+        mockMvc.perform(delete(PATH + "/{id}", UUID.randomUUID()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$.code", is("NOT_FOUND")))
+                .andExpect(jsonPath("$.message", is("No company found with provided id.")));
     }
 
 }
