@@ -1,5 +1,3 @@
-![Coverage](https://img.shields.io/badge/coverage-100%-brightgreen.svg)
-
 # Objectives
 The main goal of this application is to delete all my spreadsheets about investments and learn/practice new stacks.
 
