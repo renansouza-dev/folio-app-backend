@@ -19,13 +19,10 @@ public class CompaniesService {
 
     private final CompaniesRepository companiesRepository;
 
-    Page<CompaniesResponse> getCompanies(UUID id, String cnpj, String pageSize) {
-        if (id == null && cnpj == null) {
-            return companiesRepository
-                    .findAllCompanies(Pageable.ofSize(Integer.parseInt(pageSize)));
-        }
-        return companiesRepository
-                .findAllByIdOrCnpj(id, cnpj, Pageable.ofSize(Integer.parseInt(pageSize)));
+    Page<CompaniesResponse> getCompanies(UUID id, String cnpj, Pageable page) {
+        return id == null && cnpj == null
+                ? companiesRepository.findAllCompanies(page)
+                : companiesRepository.findAllByIdOrCnpj(id, cnpj, page);
     }
 
     void createCompanies(CompaniesRequest companiesRequest) {
@@ -51,7 +48,7 @@ public class CompaniesService {
         companiesRepository.save(entity);
     }
 
-    void deleteCompany(UUID id) {
+    void deleteCompanies(UUID id) {
         var entity = companiesRepository
                 .findById(id)
                 .orElseThrow(CompaniesNotFoundException::new);

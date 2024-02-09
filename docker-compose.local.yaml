@@ -12,7 +12,7 @@ services:
     depends_on:
       - db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/folio
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/folio-dev
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
   db:
@@ -23,7 +23,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: folio
+      POSTGRES_DB: folio-dev
 #    volumes:
 #      - ../../data:/var/lib/postgresql/data
 networks:

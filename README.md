@@ -1,27 +1,24 @@
 # Objectives
 The main goal of this application is to delete all my spreadsheets about investments and learn/practice new stacks.
 
-## Stacks
-### Development
-* Java 17
-* Spring Boot 3
+# Stacks
+Development
+* [Java 21](https://openjdk.org/projects/jdk/21/)
+* [Spring Boot 3](https://spring.io/projects/spring-boot)
 
-### Persistence
-* PostgreSQL
+Persistence
+* [PostgreSQL](https://www.postgresql.org/)
+* [Flyway Migration](https://flywaydb.org/)
 
-### Devops
-* GitHub Actions
-* GraalVM
+Devops
+* [GitHub Actions](https://docs.github.com/en/actions)
 
-## How to build the application
+# Build from source
 ```shell
-mvn -Pnative spring-boot:build-image
+docker image build -t renansouza/folio-app-backend .
 ```
 
-## How to run the application
+# How to run
 ```shell
-./folio-app-backend \
-    --GOOGLE_CLIENT_ID={GOOGLE_CLIENT_ID} \
-    --GOOGLE_CLIENT_SECRET={GOOGLE_CLIENT_SECRET} \
-    --REDIRECT_URL_DOMAIN=localhost:8080
+docker compose up -d
 ```
