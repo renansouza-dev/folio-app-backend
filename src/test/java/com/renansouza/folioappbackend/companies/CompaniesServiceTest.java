@@ -8,16 +8,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.renansouza.folioappbackend.companies.Companies.*;
+import static com.renansouza.folioappbackend.companies.Companies.getCompaniesEntity;
+import static com.renansouza.folioappbackend.companies.Companies.getCompaniesRequest;
+import static com.renansouza.folioappbackend.companies.Companies.getCompaniesResponse;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
@@ -25,7 +27,7 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
 public class CompaniesServiceTest {
 
     @Mock

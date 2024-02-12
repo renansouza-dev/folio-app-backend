@@ -23,8 +23,12 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -82,6 +86,20 @@ class CompaniesControllerTest {
     }
 
     @Test
+    public void createCompany() throws Exception {
+        // given - precondition or setup
+        doNothing().when(service).createCompanies(any(CompaniesRequest.class));
+
+        // when - action or the behaviour that we are going test
+        // then - verify the output
+        mockMvc.perform(post(PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(this.mapper.writeValueAsString(getCompaniesRequest())))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
     public void failToCreateCompany() throws Exception {
         // given - precondition or setup
         doThrow(new CompaniesAlreadyExistsException()).when(service).createCompanies(any(CompaniesRequest.class));
@@ -96,6 +114,20 @@ class CompaniesControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$.code", is("CONFLICT")))
                 .andExpect(jsonPath("$.message", is("A company with the provided data already exists.")));
+    }
+
+    @Test
+    public void updateCompany() throws Exception {
+        // given - precondition or setup
+        doNothing().when(service).updateCompanies(any(UUID.class), any(CompaniesRequest.class));
+
+        // when - action or the behaviour that we are going test
+        // then - verify the output
+        mockMvc.perform(patch(PATH + "/{id}", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(this.mapper.writeValueAsString(getCompaniesRequest())))
+                .andExpect(status().isNoContent());
     }
 
     @Test

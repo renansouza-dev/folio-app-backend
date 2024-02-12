@@ -32,7 +32,7 @@ import static org.instancio.Select.field;
 
 @Testcontainers
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class CompaniesControllerIT {
+class ITCompaniesController {
 
     private CompaniesRequest companiesRequest;
     @LocalServerPort
