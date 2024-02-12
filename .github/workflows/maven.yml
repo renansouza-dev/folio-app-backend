@@ -27,7 +27,7 @@ jobs:
         cache: maven
 
     - name: Build with Maven
-      run: mvn -B integration-test --file pom.xml -ntp
+      run: mvn -B package --file pom.xml -ntp
 
     - name: Generate JaCoCo badge
       id: jacoco
