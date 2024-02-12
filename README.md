@@ -1,3 +1,6 @@
+![Coverage](.github/badges/jacoco.svg)
+![Branch](.github/badges/branches.svg)
+
 # Objectives
 The main goal of this application is to delete all my spreadsheets about investments and learn/practice new stacks.
 
