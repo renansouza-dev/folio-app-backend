@@ -30,6 +30,7 @@ jobs:
       run: mvn -B package --file pom.xml -ntp
 
   test:
+    needs: build
     runs-on: ubuntu-latest
 
     steps:

@@ -22,6 +22,7 @@ jobs:
         run: mvn -B package --file pom.xml -ntp
 
   push:
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
