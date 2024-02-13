@@ -31,4 +31,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/renansouza-dev/${{ github.repository }}:latest
+          tags: ghcr.io/${{ github.repository }}:latest
