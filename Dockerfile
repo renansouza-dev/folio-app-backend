@@ -21,5 +21,5 @@ FROM alpine:latest
 COPY --from=build  /springboot-runtime /opt/jdk
 ENV PATH=$PATH:/opt/jdk/bin
 EXPOSE 8080
-COPY ../target/*.jar app.jar
-CMD ["java", "-showversion", "-jar", "/app/app.jar"]
+COPY target/folio-app-backend-*.jar /opt/folio-app-backend.jar
+CMD ["java", "-showversion", "-jar", "/opt/folio-app-backend.jar"]
