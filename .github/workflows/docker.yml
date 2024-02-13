@@ -36,7 +36,8 @@ jobs:
 
       - name: Get project version
         id: get_version
-        run: echo "::set-output name=version::$(grep -oPm1 "(?<=<version>)[^<]+" pom.xml | awk 'NR==1{print $1; exit}')"
+        # run: echo "::set-output name=version::$(grep -oPm1 "(?<=<version>)[^<]+" pom.xml | awk 'NR==1{print $1; exit}')"
+        run: echo "::set-output name=version::$(grep -oPm1 "(?<=<version>)[^<]+" pom.xml | awk 'NR==2{gsub(/-SNAPSHOT/, "", $1); print $1; exit}')"
 
       - name: Display project version
         run: echo "Project version is ${{ steps.get_version.outputs.version }}"
