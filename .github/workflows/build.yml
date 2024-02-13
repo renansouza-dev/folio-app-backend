@@ -26,16 +26,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract tag name
-        run: echo "TAG_NAME=$(echo ${GITHUB_REF#refs/tags/} | tr -d '\n')" >> $GITHUB_ENV
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v5.1.0
         with:
-          platforms: linux/amd64,linux/arm64
-          file: ./Dockerfile
           context: .
           push: true
-          tags: |
-            ghcr.io/${{ github.repository }}/folio-app-backend:latest
-            ghcr.io/${{ github.repository }}/folio-app-backend:${{ env.TAG_NAME }}
+          tags: ghcr.io/renansouza-dev/${{ github.repository }}:latest
