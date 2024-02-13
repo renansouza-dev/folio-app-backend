@@ -4,32 +4,29 @@ import com.renansouza.folioappbackend.companies.exceptions.CompaniesAlreadyExist
 import com.renansouza.folioappbackend.companies.exceptions.CompaniesNotFoundException;
 import com.renansouza.folioappbackend.companies.models.CompaniesEntity;
 import com.renansouza.folioappbackend.companies.models.CompaniesResponse;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.renansouza.folioappbackend.companies.Companies.getCompaniesEntity;
-import static com.renansouza.folioappbackend.companies.Companies.getCompaniesRequest;
-import static com.renansouza.folioappbackend.companies.Companies.getCompaniesResponse;
+import static com.renansouza.folioappbackend.companies.Companies.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
-public class CompaniesServiceTest {
-
+@SpringBootTest
+class CompaniesServiceTest {
     @Mock
     CompaniesRepository repository;
 
@@ -172,4 +169,5 @@ public class CompaniesServiceTest {
         // then
         verify(repository, never()).delete(any(CompaniesEntity.class));
     }
+
 }
