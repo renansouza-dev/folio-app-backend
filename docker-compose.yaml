@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: folio-app-backend:latest
+    image: renansouza-dev/folio-app-backend
     container_name: folio-app-backend
     build:
       context: .
@@ -24,8 +24,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: folio
-#    volumes:
-#      - ../../data:/var/lib/postgresql/data
 networks:
   compose-network:
     driver: bridge
