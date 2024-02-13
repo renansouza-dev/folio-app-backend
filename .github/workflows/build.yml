@@ -36,6 +36,8 @@ jobs:
           file: ./Dockerfile
           context: .
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ghcr.io/${{ github.repository }}/folio-app-backend:latest
             ghcr.io/${{ github.repository }}/folio-app-backend:${{ env.TAG_NAME }}
