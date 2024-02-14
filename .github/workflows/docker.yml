@@ -1,28 +1,28 @@
 name: Java CI with Docker Image
 
 on:
-  workflow_dispatch:
-    inputs:
-      release:
-        default: "0.0.1"
-        description: "Release Version"
+  push:
+    branches:
+      - main
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set Release version env variable
+        run: echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')" >> $GITHUB_ENV
+
+      - name: Show extracted Maven project version
+        run: echo ${{ env.RELEASE_VERSION  }}
+
       - uses: actions/checkout@v4.1.1
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
+      - name: Download artifact from release
+        uses: actions/download-artifact@v2
         with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: maven
-
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml -ntp
+          name: folio-app-backend
+          path: target/folio-app-backend-*.jar
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -37,14 +37,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Get project version
-        # id: get_version
-        # run: echo "::set-output name=version::$(grep -oPm1 "(?<=<version>)[^<]+" pom.xml | awk 'NR==1{print $1; exit}')"
-        # run: echo "::set-output name=version::$(grep version pom.xml | grep -v -e '<?xml|~'| head -n 1 | sed 's/[[:space:]]//g' | sed -E 's/<.{0,1}version>//g' | awk '{print $1}')" 
+  push:
+    runs-on: ubuntu-latest
 
-      # - name: Display project version
-        # run: echo "Project version is ${{ steps.get_version.outputs.version }}"
-
+    steps:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5.1.0
         with:
@@ -53,4 +49,4 @@ jobs:
           file: ./Dockerfile
           tags: |
             ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.event.inputs.release }}
+            ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}

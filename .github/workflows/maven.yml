@@ -21,17 +21,28 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml -ntp
 
-    - name: Set Release version env variable
-      run: echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')" >> $GITHUB_ENV
+    - name: Publish Jacoco report as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: jacoco-report
+        path: target/site/jacoco
 
-    - name: Show extracted Maven project version
-      run: echo ${{ env.RELEASE_VERSION  }}
-
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: folio-app-backend
+        path: target/folio-app-backend-*.jar
   test:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
+    - name: Download Jacoco report artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: jacoco-report
+        path: target/site/jacoco
+
     - name: Generate JaCoCo badge
       id: jacoco
       uses: cicirello/jacoco-badge-generator@v2
@@ -43,12 +54,6 @@ jobs:
       run: |
         echo "coverage = ${{ steps.jacoco.outputs.coverage }}"
         echo "branches = ${{ steps.jacoco.outputs.branches }}"
-
-    - name: Upload JaCoCo coverage report as a workflow artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: jacoco-report
-        path: target/site/jacoco/
 
     - name: Commit and push the badge (if it changed)
       uses: EndBug/add-and-commit@v7
