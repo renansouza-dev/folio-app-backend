@@ -50,7 +50,7 @@ jobs:
       uses: cicirello/jacoco-badge-generator@v2
       with:
         generate-branches-badge: true
-        generate-summary: true
+#        generate-summary: true
 
     - name: Log coverage percentages to workflow output
       run: |
