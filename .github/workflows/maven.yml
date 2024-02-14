@@ -22,16 +22,17 @@ jobs:
       run: mvn -B package --file pom.xml -ntp
 
     - name: Publish Jacoco report as artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4.3.1
       with:
         name: jacoco-report
         path: target/site/jacoco
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4.3.1
       with:
         name: folio-app-backend
         path: target/folio-app-backend-*.jar
+
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -40,7 +41,7 @@ jobs:
     - uses: actions/checkout@v4.1.1
 
     - name: Download Jacoco report artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.2
       with:
         name: jacoco-report
         path: target/site/jacoco
