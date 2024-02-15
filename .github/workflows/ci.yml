@@ -21,23 +21,41 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml -ntp
 
+    - name: Publish Jacoco report as artifact
+      uses: actions/upload-artifact@v4.3.1
+      with:
+        name: jacoco-report
+        path: target/site/jacoco
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4.3.1
+      with:
+        name: folio-app-backend
+        path: target/folio-app-backend-*.jar
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4.1.1
+
+    - name: Download Jacoco report artifact
+      uses: actions/download-artifact@v4.1.2
+      with:
+        name: jacoco-report
+        path: target/site/jacoco
+
     - name: Generate JaCoCo badge
       id: jacoco
       uses: cicirello/jacoco-badge-generator@v2
       with:
         generate-branches-badge: true
-        generate-summary: true
 
     - name: Log coverage percentages to workflow output
       run: |
         echo "coverage = ${{ steps.jacoco.outputs.coverage }}"
         echo "branches = ${{ steps.jacoco.outputs.branches }}"
-
-    - name: Upload JaCoCo coverage report as a workflow artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: jacoco-report
-        path: target/site/jacoco/
 
     - name: Commit and push the badge (if it changed)
       uses: EndBug/add-and-commit@v7
@@ -46,18 +64,6 @@ jobs:
         message: 'commit badge'
         add: '*.svg'
 
-    - name: Comment on PR with coverage percentages
-      if: ${{ github.event_name == 'pull_request' }}
-      run: |
-        REPORT=$(<badges/coverage-summary.json)
-        COVERAGE=$(jq -r '.coverage' <<< "$REPORT")%
-        BRANCHES=$(jq -r '.branches' <<< "$REPORT")%
-        NEWLINE=$'\n'
-        BODY="## JaCoCo Test Coverage Summary Statistics${NEWLINE}* __Coverage:__ ${COVERAGE}${NEWLINE}* __Branches:__ ${BRANCHES}"
-        gh pr comment ${{github.event.pull_request.number}} -b "${BODY}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
+    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
