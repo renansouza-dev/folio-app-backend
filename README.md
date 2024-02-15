@@ -16,6 +16,8 @@ Persistence
 Devops
 * [GitHub Actions](https://docs.github.com/en/actions)
   - [JaCoCo badge](https://github.com/cicirello/jacoco-badge-generator) Add an action to generate a badge for the code coverage
+  - [EndBug/add-and-commit](https://github.com/EndBug/add-and-commit) Update badge after the coverage report
+  - [docker](https://github.com/docker) Build and push the image to the github registry
 
 # Build from source
 ```shell
