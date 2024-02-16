@@ -25,7 +25,7 @@ jobs:
         run: mvn -B package --file pom.xml -ntp
 
       - id: release
-        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -P -q '[\d\.]+')" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')" >> "$GITHUB_OUTPUT"
 
   job2:
     runs-on: ubuntu-latest
