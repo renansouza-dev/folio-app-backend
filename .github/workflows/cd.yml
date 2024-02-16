@@ -78,7 +78,7 @@ jobs:
           image: ghcr.io/${{ github.repository }}:latest
 
       - name: Run Task on Amazon ECS
-        uses: smitp/amazon-ecs-run-task@v1
+        uses: smitp/amazon-ecs-run-task@v1.2.0
         with:
           task-definition: task-definition.json
           cluster: ${{ vars.MY_ECS_CLUSTER }}
