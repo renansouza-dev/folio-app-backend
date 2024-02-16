@@ -5,18 +5,15 @@ on:
     branches:
       - main
 
-env:
-  RELEASE_VERSION: latest
-
 jobs:
   build-and-push:
     name: Build Docker Image
     runs-on: ubuntu-latest
+    outputs:
+      id: release_version
+      value: latest
 
     steps:
-      - name: Set Release version env variable
-        run: echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')" >> $GITHUB_ENV
-
       - uses: actions/checkout@v4.1.1
 
       - name: Set up JDK 21
@@ -28,6 +25,10 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml -ntp
+
+      - name: Set Release version env variable
+        id: get_release_version
+        run: echo "::set-output name=my_variable::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -50,7 +51,7 @@ jobs:
           file: ./Dockerfile
           tags: |
             ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}
+            ghcr.io/${{ github.repository }}:${{ needs.job1.outputs.my_variable }}
 
   deploy:
     needs: build-and-push
@@ -78,7 +79,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: folio-app-backend
-          image: ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}
+          image: ghcr.io/${{ github.repository }}:${{ needs.job1.outputs.my_variable }}
 
       - name: Run Task on Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
