@@ -81,7 +81,7 @@ jobs:
         uses: smitp/amazon-ecs-run-task@v1
         with:
           task-definition: task-definition.json
-          cluster: my-cluster
+          cluster: ${{ vars.MY_ECS_CLUSTER }}
           count: 1
           started-by: github-actions-${{ github.actor }}
           wait-for-finish: true
