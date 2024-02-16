@@ -66,14 +66,14 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: Download task definition
-        run: aws ecs describe-task-definition --task-definition folio-task --query taskDefinition > taskdefinition.json
+        run: aws ecs describe-task-definition --task-definition folio-task --query taskDefinition
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1.2.0
         with:
           task-definition: task-definition.json
           container-name: folio-app-backend
-          image: ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}
+          image: ghcr.io/${{ github.repository }}:latest
 
       - name: Run Task on Amazon ECS
         uses: smitp/amazon-ecs-run-task@v1
