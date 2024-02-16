@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Java CI Version
 
 on:
   pull_request:
@@ -25,7 +25,7 @@ jobs:
 
     - name: Set Release version env variable
       id: release_version
-      run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')" >> "$GITHUB_OUTPUT"
+      run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -P -q '[\d\.]+')" >> "$GITHUB_OUTPUT"
 
   test:
     needs: build
