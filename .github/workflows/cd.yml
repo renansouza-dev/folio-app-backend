@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  RELEASE_VERSION: latest
+
 jobs:
   build-and-push:
     name: Build Docker Image
@@ -75,7 +78,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: folio-app-backend
-          image: ghcr.io/${{ github.repository }}:latest
+          image: ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}
 
       - name: Run Task on Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
