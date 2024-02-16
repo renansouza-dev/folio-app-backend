@@ -82,6 +82,7 @@ jobs:
         with:
           task-definition: task-definition.json
           cluster: ${{ vars.MY_ECS_CLUSTER }}
+          service: ${{ vars.MY_ECS_SERVICE }}
           count: 1
           started-by: github-actions-${{ github.actor }}
           wait-for-service-stability: true
