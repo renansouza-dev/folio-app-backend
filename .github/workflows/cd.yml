@@ -10,8 +10,7 @@ jobs:
     name: Build Docker Image
     runs-on: ubuntu-latest
     outputs:
-      id: release_version
-      value: latest
+      version: ${{ steps.release_version.outputs.version }}
 
     steps:
       - uses: actions/checkout@v4.1.1
@@ -27,9 +26,9 @@ jobs:
         run: mvn -B package --file pom.xml -ntp
 
       - name: Set Release version env variable
-        id: get_release_version
-        run: echo "::set-output name=my_variable::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')"
-
+        id: release_version
+        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')" >> "$GITHUB_OUTPUT"
+        
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -51,7 +50,7 @@ jobs:
           file: ./Dockerfile
           tags: |
             ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ needs.job1.outputs.my_variable }}
+            ghcr.io/${{ github.repository }}:${{ steps.release_version.outputs.version }}
 
   deploy:
     needs: build-and-push
@@ -79,7 +78,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: folio-app-backend
-          image: ghcr.io/${{ github.repository }}:${{ needs.job1.outputs.my_variable }}
+          image: ghcr.io/${{ github.repository }}:${{ steps.release_version.outputs.version }}
 
       - name: Run Task on Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
