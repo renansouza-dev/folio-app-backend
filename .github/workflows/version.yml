@@ -1,0 +1,37 @@
+name: Java CI with Maven
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release_version.outputs.version }}
+
+    steps:
+    - uses: actions/checkout@v4.1.1
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml -ntp
+
+    - name: Set Release version env variable
+      id: release_version
+      run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')" >> "$GITHUB_OUTPUT"
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - env:
+        VERSION: ${{ steps.release_version.outputs.version }}
+      run: echo "$VERSION"
