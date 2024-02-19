@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      RELEASE_VERSION: ${{ steps.get-release-version.outputs.RELEASE_VERSION }}
+      RELEASE_VERSION: ${{ steps.release.outputs.version }}
 
     steps:
       - uses: actions/checkout@v4.1.1
@@ -22,7 +22,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn -B package --file pom.xml -ntp
+        run: mvn -B package -DskipTests --file pom.xml -ntp
 
       - name: Get Maven Version
         id: get-maven-version
@@ -31,11 +31,11 @@ jobs:
           echo "MAVEN_VERSION=${MAVEN_VERSION}" >> $GITHUB_ENV
 
       - name: Extract and Display Version
-        id: get-release-version
+        id: version
         run: |
-          RELEASE_VERSION=$(echo $MAVEN_VERSION | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-          echo "RELEASE_VERSION=${RELEASE_VERSION}" >> $GITHUB_ENV
-          echo "Using Release Version: $RELEASE_VERSION"
+          version=$(echo $MAVEN_VERSION | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "version=${version}" >> $GITHUB_ENV
+          echo "Using Release Version: $version"
 
   job2:
     runs-on: ubuntu-latest
@@ -43,5 +43,5 @@ jobs:
 
     steps:
       - env:
-          OUTPUT1: ${{needs.job1.outputs.RELEASE_VERSION}}
+          OUTPUT1: ${{needs.job1.outputs.version}}
         run: echo "$OUTPUT1"
