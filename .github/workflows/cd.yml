@@ -69,18 +69,16 @@ jobs:
 
     steps:
       - env:
-          RELEASE_VERSION: ${{needs.job1.outputs.version}}
+          RELEASE_VERSION: ${{needs.build-and-push.outputs.version}}
         run: echo "Deploying using version ${{ github.repository }}:$RELEASE_VERSION"
 
       - name: Print the version
         run: |
-          echo "Building Image for version: ${{ needs.job1.outputs.version }}"
+          echo "Building Image for version: $RELEASE_VERSION"
 
       - uses: actions/checkout@v4.1.1
-        if: ${{ needs.job1.outputs.version != null }}
 
       - name: Configure AWS credentials
-        if: ${{ needs.job1.outputs.version != null }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -88,13 +86,11 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: Download task definition
-        if: ${{ needs.job1.outputs.version != null }}
         run: |
           aws ecs describe-task-definition --task-definition ${{ vars.MY_ECS_TASK_DEFINITION }} \
           --query taskDefinition > task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
-        if: ${{ needs.job1.outputs.version != null }}
         uses: aws-actions/amazon-ecs-render-task-definition@v1.2.0
         with:
           task-definition: task-definition.json
@@ -102,7 +98,6 @@ jobs:
           image: ghcr.io/${{ github.repository }}:$RELEASE_VERSION
 
       - name: Run Task on Amazon ECS
-        if: ${{ needs.job1.outputs.version != null }}
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: task-definition.json
