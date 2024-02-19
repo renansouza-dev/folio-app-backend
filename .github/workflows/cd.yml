@@ -59,7 +59,7 @@ jobs:
           file: ./Dockerfile
           tags: |
             ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:$version
+            ghcr.io/${{ github.repository }}:${{ steps.release.outputs.version }}
 
   deploy:
     needs: build-and-push
