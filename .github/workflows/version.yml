@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      version: ${{ steps.release.outputs.version }}
+      version: ${{ steps.build.outputs.version }}
 
     steps:
       - uses: actions/checkout@v4.1.1
@@ -24,7 +24,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml -ntp
 
-      - id: release
+      - id: build
         run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_OUTPUT"
 
   job2:
@@ -33,11 +33,10 @@ jobs:
 
     steps:
       - env:
-          OUTPUT1: ${{needs.job1.outputs.version}}
+          OUTPUT1: ${{ needs.job1.outputs.version }}
         run: echo "$OUTPUT1"
 
       - name: Extract and Display Version
         run: |
-          version=${{ needs.job1.outputs.version }}
-          formatted_version=$(echo version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-          echo "Formatted Version: formatted_version"
+          echo "formatted_version=$(echo ${{ needs.job1.outputs.version }} | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> "$GITHUB_OUTPUT"
+          echo "Formatted Version: $formatted_version"
