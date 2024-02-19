@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      RELEASE_VERSION: ${{ steps.release.outputs.version }}
+      version: ${{ steps.release.outputs.version }}
 
     steps:
       - uses: actions/checkout@v4.1.1
@@ -26,15 +26,17 @@ jobs:
 
       - name: Get Maven Version
         run: |
-          MAVEN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo "MAVEN_VERSION=${MAVEN_VERSION}" >> $GITHUB_ENV
+          snapshot=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "snapshot=${snapshot}" >> $GITHUB_ENV
 
       - name: Extract and Display Version
         id: release
-        run: echo "version=$($MAVEN_VERSION | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> $GITHUB_OUTPUT
+        run: |
+          echo "version=$($snapshot | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> $GITHUB_OUTPUT
+          echo "Using Release Version: $version"
 #        run: |
-#          version=$(echo $MAVEN_VERSION | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-#          echo "version=$(echo $MAVEN_VERSION | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> $GITHUB_OUTPUT
+#          version=$(echo $snapshot | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+#          echo "version=$(echo $snapshot | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> $GITHUB_OUTPUT
 #          echo "Using Release Version: $version"
 
   job2:
