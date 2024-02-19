@@ -31,13 +31,13 @@ jobs:
 
       - name: Extract and Display Version
         id: release
-        run: |
-          echo "version=$($snapshot | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> $GITHUB_OUTPUT
-          echo "Using Release Version: $version"
 #        run: |
-#          version=$(echo $snapshot | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-#          echo "version=$(echo $snapshot | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> $GITHUB_OUTPUT
+#          echo "version=$($snapshot | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> $GITHUB_OUTPUT
 #          echo "Using Release Version: $version"
+        run: |
+          version=$(echo $snapshot | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "version=$(echo $snapshot | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> $GITHUB_OUTPUT
+          echo "Using Release Version: $version"
 
   job2:
     runs-on: ubuntu-latest
