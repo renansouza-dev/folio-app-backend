@@ -43,5 +43,5 @@ jobs:
 
     steps:
       - env:
-          OUTPUT1: ${{needs.job1.outputs.version}}
+          OUTPUT1: ${{needs.job1.outputs.RELEASE_VERSION}}
         run: echo "$OUTPUT1"
