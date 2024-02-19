@@ -38,5 +38,5 @@ jobs:
 
       - name: Extract and Display Version
         run: |
-          echo "formatted_version=$(echo ${{ needs.job1.outputs.version }} | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> "$GITHUB_OUTPUT"
+          echo "formatted_version=$(${{ needs.job1.outputs.version }} | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> "$GITHUB_OUTPUT"
           echo "Formatted Version: $formatted_version"
