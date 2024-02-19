@@ -25,13 +25,12 @@ jobs:
         run: mvn -B package -DskipTests --file pom.xml -ntp
 
       - name: Get Maven Version
-        id: release
         run: |
           MAVEN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "MAVEN_VERSION=${MAVEN_VERSION}" >> $GITHUB_ENV
 
       - name: Extract and Display Version
-        id: version
+        id: release
         run: |
           version=$(echo $MAVEN_VERSION | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
           echo "version=${version}" >> $GITHUB_OUTPUT
