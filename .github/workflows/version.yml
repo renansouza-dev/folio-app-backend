@@ -32,8 +32,8 @@ jobs:
       - name: Extract and Display Version
         id: release
         run: |
-          version=$(echo $MAVEN_VERSION | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-          echo "version=${version}" >> $GITHUB_OUTPUT
+#          version=$(echo $MAVEN_VERSION | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "version=$(echo $MAVEN_VERSION | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> $GITHUB_OUTPUT
           echo "Using Release Version: $version"
 
   job2:
