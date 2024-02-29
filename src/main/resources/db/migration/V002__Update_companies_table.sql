@@ -1,0 +1,1 @@
+ALTER TABLE companies ADD deleted boolean NOT NULL DEFAULT false;
