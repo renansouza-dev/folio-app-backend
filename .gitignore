@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### Terraform ###
+.github/deploy/.terraform/
+.github/deploy/terraform.*
