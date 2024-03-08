@@ -7,7 +7,7 @@ env:
   TF_CLOUD_ORGANIZATION: "folio"
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
   TF_WORKSPACE: "folio-workspace"
-  CONFIG_DIRECTORY: "../deploy/"
+  CONFIG_DIRECTORY: "./"
 
 jobs:
   terraform:
