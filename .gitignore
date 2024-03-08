@@ -34,5 +34,6 @@ build/
 
 
 ### Terraform ###
-.github/deploy/.terraform/
-.github/deploy/terraform.*
+.terraform/
+.terraform.*
+terraform.*
