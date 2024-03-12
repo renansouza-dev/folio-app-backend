@@ -113,10 +113,6 @@ resource "aws_security_group" "default_rds" {
 resource "aws_db_subnet_group" "default_rds_subnet_group" {
   name        = "tutorial_db_subnet_group"
   description = "DB subnet group for tutorial"
-
-  // Since the db subnet group requires 2 or more subnets, we are going to
-  // loop through our private subnets in "tutorial_private_subnet" and
-  // add them to this db subnet group
   subnet_ids  = [for subnet in aws_subnet.default_private_subnet : subnet.id]
 }
 
@@ -132,17 +128,11 @@ resource "aws_db_instance" "application_database" {
   skip_final_snapshot    = true
 }
 
-resource "aws_key_pair" "tutorial_kp" {
-  key_name   = "tutorial_kp"
-  public_key = file("tutorial_kp.pub")
-}
-
 resource "aws_instance" "application_server" {
   count                  = 1
   ami                    = "ami-0f403e3180720dd7e"
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.default_public_subnet[count.index].id
-  key_name               = aws_key_pair.tutorial_kp.key_name
   vpc_security_group_ids = [aws_security_group.default_ec2.id]
 }
 
