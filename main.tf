@@ -10,52 +10,144 @@ terraform {
 }
 
 provider "aws" {
-    region  = "us-east-1"
+    region  = var.aws_region
 }
 
-resource "aws_default_vpc" "default" {
-#     cidr_block       = "10.0.0.0/24"
-#     instance_tenancy = "default"
+data "aws_availability_zones" "available" {
+  state = "available"
 }
 
-resource "aws_internet_gateway" "main" {
-    vpc_id = aws_default_vpc.default.id
-    
-    depends_on = [aws_default_vpc.default]
+resource "aws_vpc" "default_vpc" {
+    cidr_block           = var.vpc_cidr_block
+    enable_dns_hostnames = true
 }
 
-resource "aws_egress_only_internet_gateway" "main" {
-    vpc_id = aws_default_vpc.default.id
-    
-    depends_on = [aws_default_vpc.default]
+resource "aws_internet_gateway" "default_gateway" {
+    vpc_id = aws_vpc.default_vpc.id
 }
 
-resource "aws_subnet" "main" {
-    vpc_id     = aws_default_vpc.default.id
-    cidr_block = "10.0.0.0/24"
-    
-    depends_on = [aws_default_vpc.default]
+resource "aws_subnet" "default_public_subnet" {
+  count             = var.subnet_count.public
+  vpc_id            = aws_vpc.default_vpc.id
+  cidr_block        = var.public_subnet_cidr_blocks[count.index]
+  availability_zone = data.aws_availability_zones.available.names[count.index]
 }
 
-resource "aws_default_route_table" "main" {
-    default_route_table_id = aws_default_vpc.default.default_route_table_id
-
-    route {
-        cidr_block = "0.0.0.0/0"
-        gateway_id = aws_internet_gateway.main.id
-    }
-
-    route {
-        ipv6_cidr_block        = "::/0"
-        egress_only_gateway_id = aws_egress_only_internet_gateway.main.id
-    }
-    
-    depends_on = [aws_default_vpc.default]
+resource "aws_subnet" "default_private_subnet" {
+  count             = var.subnet_count.private
+  vpc_id            = aws_vpc.default_vpc.id
+  cidr_block        = var.private_subnet_cidr_blocks[count.index]
+  availability_zone = data.aws_availability_zones.available.names[count.index]
 }
 
-resource "aws_instance" "app_server" {
-    ami           = "ami-0440d3b780d96b29d"
-    instance_type = "t2.micro"
-    
-    depends_on = [aws_default_vpc.default]
+resource "aws_route_table" "default_public_rt" {
+  vpc_id = aws_vpc.default_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.default_gateway.id
+  }
+}
+
+resource "aws_route_table_association" "public" {
+  count          = var.subnet_count.public
+  route_table_id = aws_route_table.default_public_rt.id
+  subnet_id      = aws_subnet.default_public_subnet[count.index].id
+}
+
+resource "aws_route_table" "default_private_rt" {
+  vpc_id = aws_vpc.default_vpc.id
+}
+
+resource "aws_route_table_association" "private" {
+  count          = var.subnet_count.private
+  route_table_id = aws_route_table.default_private_rt.id
+  subnet_id      = aws_subnet.default_private_subnet[count.index].id
+}
+
+resource "aws_security_group" "default_ec2" {
+  name        = "aws_security_group_ec2"
+  description = "Security group for tutorial web servers"
+  vpc_id      = aws_vpc.default_vpc.id
+
+  ingress {
+    description = "Allow all traffic through HTTP"
+    from_port   = "80"
+    to_port     = "80"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Allow SSH from my computer"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "tcp"
+    cidr_blocks = ["185.128.9.198/32"]
+#     cidr_blocks = ["${var.my_ip}/32"]
+  }
+
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "default_rds" {
+  name        = "aws_security_group_rds"
+  description = "Security group for tutorial databases"
+  vpc_id      = aws_vpc.default_vpc.id
+
+  ingress {
+    description     = "Allow PostgreSQL traffic from only the ec2 sg"
+    from_port       = "5432"
+    to_port         = "5432"
+    protocol        = "tcp"
+    security_groups = [aws_security_group.default_ec2.id]
+  }
+}
+
+resource "aws_db_subnet_group" "default_rds_subnet_group" {
+  name        = "tutorial_db_subnet_group"
+  description = "DB subnet group for tutorial"
+
+  // Since the db subnet group requires 2 or more subnets, we are going to
+  // loop through our private subnets in "tutorial_private_subnet" and
+  // add them to this db subnet group
+  subnet_ids  = [for subnet in aws_subnet.default_private_subnet : subnet.id]
+}
+
+resource "aws_db_instance" "application_database" {
+  instance_class         = "db.t3.micro"
+  allocated_storage      = 5
+  engine                 = "postgres"
+  engine_version         = "16"
+  username               = "postgres"
+  password               = "postgres"
+  db_subnet_group_name   = aws_db_subnet_group.default_rds_subnet_group.id
+  vpc_security_group_ids = [aws_security_group.default_rds.id]
+  skip_final_snapshot    = true
+}
+
+resource "aws_key_pair" "tutorial_kp" {
+  key_name   = "tutorial_kp"
+  public_key = file("tutorial_kp.pub")
+}
+
+resource "aws_instance" "application_server" {
+  count                  = 1
+  ami                    = "ami-0f403e3180720dd7e"
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.default_public_subnet[count.index].id
+  key_name               = aws_key_pair.tutorial_kp.key_name
+  vpc_security_group_ids = [aws_security_group.default_ec2.id]
+}
+
+resource "aws_eip" "tutorial_web_eip" {
+  count    = 1
+  instance = aws_instance.application_server[count.index].id
+  vpc      = true
 }
