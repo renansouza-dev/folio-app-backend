@@ -12,18 +12,18 @@ services:
     depends_on:
       - db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/folio
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/folio-app-db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
   db:
-    image: postgres
+    image: postgres:16-alpine
     container_name: postgres
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: folio
+      POSTGRES_DB: folio-app-db
 networks:
   compose-network:
     driver: bridge

@@ -5,6 +5,6 @@ spring:
       ddl-auto: none
     open-in-view: false
   datasource:
-    url: jdbc:postgresql://localhost:5432/folio-dev
+    url: jdbc:postgresql://localhost:5432/folio-app-db-dev
     username: postgres
     password: postgres

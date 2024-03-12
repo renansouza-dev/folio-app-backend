@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.SoftDelete;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -26,6 +27,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @Entity
+@SoftDelete
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "companies",
