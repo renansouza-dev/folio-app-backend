@@ -72,8 +72,8 @@ resource "aws_security_group" "default_ec2" {
 
   ingress {
     description = "Allow all traffic through HTTP"
-    from_port   = "80"
-    to_port     = "80"
+    from_port   = "8080"
+    to_port     = "8080"
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -136,7 +136,7 @@ resource "aws_instance" "application_server" {
   vpc_security_group_ids = [aws_security_group.default_ec2.id]
 }
 
-resource "aws_eip" "tutorial_web_eip" {
+resource "aws_eip" "application_web_eip" {
   count    = 1
   instance = aws_instance.application_server[count.index].id
   vpc      = true
