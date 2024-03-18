@@ -47,7 +47,7 @@ class CompaniesControllerTest {
     CompaniesService service;
 
     @Test
-    public void getAllCompanies() throws Exception {
+    void getAllCompanies() throws Exception {
         // given - precondition or setup
         var companiesResponse = getCompaniesResponse();
         when(service.getCompanies(any(), any(), any())).thenReturn(new PageImpl<>(List.of(companiesResponse)));
@@ -72,7 +72,7 @@ class CompaniesControllerTest {
     }
 
     @Test
-    public void getNoCompanies() throws Exception {
+    void getNoCompanies() throws Exception {
         // given - precondition or setup
         when(service.getCompanies(any(), any(), any())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
@@ -86,7 +86,7 @@ class CompaniesControllerTest {
     }
 
     @Test
-    public void createCompany() throws Exception {
+    void createCompany() throws Exception {
         // given - precondition or setup
         doNothing().when(service).createCompanies(any(CompaniesRequest.class));
 
@@ -100,7 +100,7 @@ class CompaniesControllerTest {
     }
 
     @Test
-    public void failToCreateCompany() throws Exception {
+    void failToCreateCompany() throws Exception {
         // given - precondition or setup
         doThrow(new CompaniesAlreadyExistsException()).when(service).createCompanies(any(CompaniesRequest.class));
 
@@ -117,7 +117,7 @@ class CompaniesControllerTest {
     }
 
     @Test
-    public void updateCompany() throws Exception {
+    void updateCompany() throws Exception {
         // given - precondition or setup
         doNothing().when(service).updateCompanies(any(UUID.class), any(CompaniesRequest.class));
 
@@ -131,7 +131,7 @@ class CompaniesControllerTest {
     }
 
     @Test
-    public void failToUpdateCompany() throws Exception {
+    void failToUpdateCompany() throws Exception {
         // given - precondition or setup
         doThrow(new CompaniesNotFoundException())
                 .when(service).updateCompanies(any(UUID.class), any(CompaniesRequest.class));
@@ -149,7 +149,7 @@ class CompaniesControllerTest {
     }
 
     @Test
-    public void deleteCompany() throws Exception {
+    void deleteCompany() throws Exception {
         // given - precondition or setup
         willDoNothing().given(service).deleteCompanies(any(UUID.class));
 
@@ -160,7 +160,7 @@ class CompaniesControllerTest {
     }
 
     @Test
-    public void failToDeleteCompany() throws Exception {
+    void failToDeleteCompany() throws Exception {
         // given - precondition or setup
         doThrow(new CompaniesNotFoundException()).when(service).deleteCompanies(any(UUID.class));
 
